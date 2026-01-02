@@ -1,8 +1,0 @@
-{
-  "functions": {
-    "Frontend/*.html": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  }
-}
