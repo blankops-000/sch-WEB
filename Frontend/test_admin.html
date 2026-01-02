@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .login-form { max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; }
+        input { width: 100%; padding: 10px; margin: 10px 0; }
+        button { width: 100%; padding: 10px; background: #007cba; color: white; border: none; }
+        .dashboard { padding: 20px; }
+        .error { color: red; padding: 10px; background: #ffe6e6; }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        let currentUser = null;
+        
+        function checkAuth() {
+            const stored = localStorage.getItem('admin_user');
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch (e) {
+                    localStorage.removeItem('admin_user');
+                }
+            }
+            return null;
+        }
+        
+        function login(username, password) {
+            if (username === 'admin' && password === 'outering2024') {
+                const user = { name: 'Administrator', username: 'admin' };
+                localStorage.setItem('admin_user', JSON.stringify(user));
+                currentUser = user;
+                showDashboard();
+                return true;
+            }
+            return false;
+        }
+        
+        function logout() {
+            localStorage.removeItem('admin_user');
+            currentUser = null;
+            showLogin();
+        }
+        
+        function showLogin(error = '') {
+            document.getElementById('app').innerHTML = `
+                <div class="login-form">
+                    <h2>Admin Login</h2>
+                    ${error ? `<div class="error">${error}</div>` : ''}
+                    <form onsubmit="handleLogin(event)">
+                        <input type="text" id="username" placeholder="Username" required>
+                        <input type="password" id="password" placeholder="Password" required>
+                        <button type="submit">Login</button>
+                    </form>
+                    <p><small>Username: admin | Password: outering2024</small></p>
+                </div>
+            `;
+        }
+        
+        function showDashboard() {
+            document.getElementById('app').innerHTML = `
+                <div class="dashboard">
+                    <h1>Admin Dashboard</h1>
+                    <p>Welcome, ${currentUser.name}!</p>
+                    <button onclick="logout()">Logout</button>
+                    
+                    <div style="margin-top: 30px;">
+                        <h3>Quick Stats</h3>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 20px;">
+                            <div style="padding: 20px; background: #f0f8ff; border-radius: 8px; text-align: center;">
+                                <h4>Students</h4>
+                                <p style="font-size: 24px; font-weight: bold;">956</p>
+                            </div>
+                            <div style="padding: 20px; background: #f0fff0; border-radius: 8px; text-align: center;">
+                                <h4>Staff</h4>
+                                <p style="font-size: 24px; font-weight: bold;">68</p>
+                            </div>
+                            <div style="padding: 20px; background: #fff0f5; border-radius: 8px; text-align: center;">
+                                <h4>Events</h4>
+                                <p style="font-size: 24px; font-weight: bold;">12</p>
+                            </div>
+                            <div style="padding: 20px; background: #fffacd; border-radius: 8px; text-align: center;">
+                                <h4>Messages</h4>
+                                <p style="font-size: 24px; font-weight: bold;">8</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (login(username, password)) {
+                // Login successful
+            } else {
+                showLogin('Invalid credentials');
+            }
+        }
+        
+        // Initialize
+        currentUser = checkAuth();
+        if (currentUser) {
+            showDashboard();
+        } else {
+            showLogin();
+        }
+    </script>
+</body>
+</html>

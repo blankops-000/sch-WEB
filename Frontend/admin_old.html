@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outering Schools - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- Login Page -->
+    <div id="loginPage" class="min-h-screen flex items-center justify-center gradient-bg">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lock text-white text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900">Admin Login</h2>
+                <p class="text-gray-600 mt-2">Outering Schools Administration</p>
+            </div>
+            
+            <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 hidden"></div>
+            
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Username</label>
+                    <input
+                        type="text"
+                        id="username"
+                        required
+                        class="w-full px-4 py-3 rounded-lg border focus:border-green-500 focus:outline-none"
+                        placeholder="Enter username"
+                    />
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        required
+                        class="w-full px-4 py-3 rounded-lg border focus:border-green-500 focus:outline-none"
+                        placeholder="Enter password"
+                    />
+                </div>
+                
+                <button
+                    type="submit"
+                    id="loginBtn"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition"
+                >
+                    Login to Admin Panel
+                </button>
+                
+                <div class="mt-6 text-center">
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
+                        <p class="font-medium text-yellow-800 mb-1">Demo Credentials:</p>
+                        <p class="text-yellow-700 text-xs">Username: admin | Password: outering2024</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <a href="outering-home.html" class="text-green-600 hover:text-green-800">
+                        ← Back to Website
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="hidden min-h-screen bg-gray-100 flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg flex flex-col">
+            <div class="p-6 border-b">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-user-shield text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold">Admin Panel</h1>
+                        <p class="text-sm text-gray-600">Administrator</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="p-4 flex-1">
+                <button onclick="showSection('dashboard')" class="nav-btn w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition bg-green-100 text-green-700 font-medium">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button onclick="showSection('news')" class="nav-btn w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-newspaper"></i>
+                    <span>News</span>
+                </button>
+                <button onclick="showSection('calendar')" class="nav-btn w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendar</span>
+                </button>
+                <button onclick="showSection('about')" class="nav-btn w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-school"></i>
+                    <span>About School</span>
+                </button>
+                <button onclick="showSection('fees')" class="nav-btn w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Fees</span>
+                </button>
+                <button onclick="showSection('uniform')" class="nav-btn w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-tshirt"></i>
+                    <span>Uniform</span>
+                </button>
+                <button onclick="showSection('contact')" class="nav-btn w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-phone"></i>
+                    <span>Contact</span>
+                </button>
+            </nav>
+            
+            <div class="mt-auto p-4 border-t border-gray-200">
+                <a href="outering-home.html" class="w-full px-4 py-2 text-gray-600 hover:text-gray-800 mb-2 block text-center border border-gray-300 rounded-lg">
+                    <i class="fas fa-home mr-2"></i>View Website
+                </a>
+                <button onclick="logout()" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="admin-section">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Dashboard Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Total Students</p>
+                                <p class="text-2xl font-bold text-gray-900">800+</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-green-100">
+                                <i class="fas fa-users text-2xl text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Total Staff</p>
+                                <p class="text-2xl font-bold text-gray-900">45+</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-green-100">
+                                <i class="fas fa-chalkboard-teacher text-2xl text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Active Events</p>
+                                <p class="text-2xl font-bold text-gray-900">12</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-green-100">
+                                <i class="fas fa-calendar-alt text-2xl text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">New Messages</p>
+                                <p class="text-2xl font-bold text-gray-900">5</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-green-100">
+                                <i class="fas fa-envelope text-2xl text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Quick Actions</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="showSection('news')" class="p-4 border rounded-lg text-center hover:bg-gray-50 transition">
+                            <i class="fas fa-newspaper text-green-600 text-2xl mb-2 block"></i>
+                            <p class="font-medium">Manage News</p>
+                        </button>
+                        <button onclick="showSection('calendar')" class="p-4 border rounded-lg text-center hover:bg-gray-50 transition">
+                            <i class="fas fa-calendar-plus text-green-600 text-2xl mb-2 block"></i>
+                            <p class="font-medium">Add Event</p>
+                        </button>
+                        <button onclick="showSection('about')" class="p-4 border rounded-lg text-center hover:bg-gray-50 transition">
+                            <i class="fas fa-edit text-green-600 text-2xl mb-2 block"></i>
+                            <p class="font-medium">Edit About</p>
+                        </button>
+                        <button onclick="showNotification('Reports feature coming soon!', 'info')" class="p-4 border rounded-lg text-center hover:bg-gray-50 transition">
+                            <i class="fas fa-chart-bar text-green-600 text-2xl mb-2 block"></i>
+                            <p class="font-medium">View Reports</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Section -->
+            <div id="newsSection" class="admin-section hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">News Management</h2>
+                <div class="bg-white rounded-xl shadow p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold">Create New Article</h3>
+                        <button onclick="toggleNewsForm()" id="newsFormBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                            <i class="fas fa-plus mr-2"></i>New Article
+                        </button>
+                    </div>
+                    
+                    <form id="newsForm" class="hidden space-y-4">
+                        <input type="text" id="newsTitle" placeholder="Article Title" class="w-full p-3 border rounded-lg" required>
+                        <textarea id="newsContent" placeholder="Article Content" class="w-full p-3 border rounded-lg h-32" required></textarea>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <select id="newsCategory" class="p-3 border rounded-lg">
+                                <option value="Achievement">Achievement</option>
+                                <option value="Event">Event</option>
+                                <option value="Announcement">Announcement</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Infrastructure">Infrastructure</option>
+                            </select>
+                            <select id="newsStatus" class="p-3 border rounded-lg">
+                                <option value="Published">Published</option>
+                                <option value="Draft">Draft</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+                            Create Article
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-bold mb-4">Published Articles</h3>
+                    <div id="articlesList" class="space-y-3">
+                        <div class="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                                <h4 class="font-medium">Students Win National Science Competition</h4>
+                                <p class="text-sm text-gray-500">2024-01-15 • Achievement</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">Published</span>
+                                <button onclick="deleteArticle(this)" class="text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Section -->
+            <div id="calendarSection" class="admin-section hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Calendar Management</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-lg font-bold mb-4">Add New Event</h3>
+                        <form id="eventForm" class="space-y-4">
+                            <input type="text" id="eventTitle" placeholder="Event Title" class="w-full p-3 border rounded-lg" required>
+                            <input type="date" id="eventDate" class="w-full p-3 border rounded-lg" required>
+                            <select id="eventCategory" class="w-full p-3 border rounded-lg">
+                                <option value="Academic">Academic</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Cultural">Cultural</option>
+                                <option value="Holiday">Holiday</option>
+                            </select>
+                            <button type="submit" class="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700">
+                                <i class="fas fa-plus mr-2"></i>Add Event
+                            </button>
+                        </form>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-lg font-bold mb-4">Upcoming Events</h3>
+                        <div id="eventsList" class="space-y-3">
+                            <div class="flex justify-between items-center p-3 border rounded-lg">
+                                <div>
+                                    <h4 class="font-medium">Mid-Term Exams</h4>
+                                    <p class="text-sm text-gray-500">2024-02-19 • Academic</p>
+                                </div>
+                                <button onclick="deleteEvent(this)" class="text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div id="aboutSection" class="admin-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">About School Management</h2>
+                    <button onclick="toggleAboutEdit()" id="aboutEditBtn" class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white">
+                        <i class="fas fa-edit mr-2"></i>Edit Content
+                    </button>
+                </div>
+                
+                <div class="grid gap-6">
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-lg font-bold mb-4">Vision Statement</h3>
+                        <div id="visionView">
+                            <p class="text-gray-700">To be a premier educational institution that nurtures global citizens, innovative thinkers, and compassionate leaders.</p>
+                        </div>
+                        <textarea id="visionEdit" class="hidden w-full p-3 border rounded-lg h-24">To be a premier educational institution that nurtures global citizens, innovative thinkers, and compassionate leaders.</textarea>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-lg font-bold mb-4">Mission Statement</h3>
+                        <div id="missionView">
+                            <p class="text-gray-700">Providing quality education with a focus on academic excellence, character development, and holistic growth.</p>
+                        </div>
+                        <textarea id="missionEdit" class="hidden w-full p-3 border rounded-lg h-24">Providing quality education with a focus on academic excellence, character development, and holistic growth.</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fees Section -->
+            <div id="feesSection" class="admin-section hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Fees Management</h2>
+                <div class="grid gap-6">
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-lg font-bold mb-4">Update Fee Structure</h3>
+                        <form id="feesForm" class="space-y-4">
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <select id="feeGrade" class="p-3 border rounded-lg">
+                                    <option value="playgroup">Play Group</option>
+                                    <option value="pp1-pp2">PP1-PP2</option>
+                                    <option value="grade1-6">Grade 1-6</option>
+                                    <option value="grade7-9">Grade 7-9</option>
+                                    <option value="grade10">Grade 10</option>
+                                    <option value="form3">Form 3</option>
+                                    <option value="form4">Form 4</option>
+                                </select>
+                                <input type="number" id="term1Fee" placeholder="Term 1 Fee" class="p-3 border rounded-lg">
+                                <input type="number" id="term2Fee" placeholder="Term 2 Fee" class="p-3 border rounded-lg">
+                            </div>
+                            <input type="number" id="term3Fee" placeholder="Term 3 Fee" class="p-3 border rounded-lg">
+                            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+                                Update Fees
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uniform Section -->
+            <div id="uniformSection" class="admin-section hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Uniform Requirements</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-lg font-bold mb-4">Boys Uniform</h3>
+                        <textarea id="boysUniform" class="w-full p-3 border rounded-lg h-48">Charcoal grey trousers
+White short-sleeved shirt with school badge
+Plain green tie
+Jungle green sweater or windbreaker with white sleeve stripes
+Green blazer with yellow sleeve stripes (optional)
+Black leather shoes
+Grey socks with blue and white stripes
+Green/white tracksuit (Ksh 1,500)</textarea>
+                        <button onclick="saveUniform('boys')" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                            Save Changes
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-lg font-bold mb-4">Girls Uniform</h3>
+                        <textarea id="girlsUniform" class="w-full p-3 border rounded-lg h-48">Charcoal grey skirt with box pleat in front (not mini)
+White short-sleeved blouse with school badge
+Plain green tie
+Green sweater or windbreaker (same as boys)
+Green blazer (same as boys)
+Black leather shoes
+White socks with green and white stripes
+Green/white tracksuit (Ksh 1,500)</textarea>
+                        <button onclick="saveUniform('girls')" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div id="contactSection" class="admin-section hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
+                <div class="grid gap-6">
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-lg font-bold mb-4">Phone Numbers</h3>
+                        <div id="phonesList" class="space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <input type="text" value="0111214554" class="flex-1 p-2 border rounded">
+                                <span class="text-sm text-gray-500">Office</span>
+                                <button onclick="deletePhone(this)" class="text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex space-x-2">
+                            <input type="text" id="newPhone" placeholder="New phone number" class="flex-1 p-2 border rounded">
+                            <button onclick="addPhone()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-lg font-bold mb-4">Location Details</h3>
+                        <textarea id="locationDetails" class="w-full p-3 border rounded-lg h-32">Mowlem Estate Tononoka
+Pheroz Road
+Kiambiu Estate
+Behind Buru Buru</textarea>
+                        <button onclick="saveLocation()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                            Save Location
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'outering2024') {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                showNotification('Login successful!', 'success');
+            } else {
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.textContent = 'Invalid credentials';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        // Navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + 'Section').classList.remove('hidden');
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = 'nav-btn w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition text-gray-600 hover:bg-gray-100';
+            });
+            event.target.className = 'nav-btn w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition bg-green-100 text-green-700 font-medium';
+        }
+
+        // News management
+        function toggleNewsForm() {
+            const form = document.getElementById('newsForm');
+            const btn = document.getElementById('newsFormBtn');
+            if (form.classList.contains('hidden')) {
+                form.classList.remove('hidden');
+                btn.innerHTML = '<i class="fas fa-times mr-2"></i>Cancel';
+            } else {
+                form.classList.add('hidden');
+                btn.innerHTML = '<i class="fas fa-plus mr-2"></i>New Article';
+            }
+        }
+
+        document.getElementById('newsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const title = document.getElementById('newsTitle').value;
+            const content = document.getElementById('newsContent').value;
+            const category = document.getElementById('newsCategory').value;
+            const status = document.getElementById('newsStatus').value;
+            
+            if (!title || !content) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/news', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer admin-token'
+                    },
+                    body: JSON.stringify({
+                        title,
+                        content,
+                        category: category.toLowerCase(),
+                        status: status.toLowerCase()
+                    })
+                });
+                
+                if (response.ok) {
+                    const newArticle = await response.json();
+                    const articleDiv = document.createElement('div');
+                    articleDiv.className = 'flex justify-between items-center p-3 border rounded-lg';
+                    articleDiv.innerHTML = `
+                        <div>
+                            <h4 class="font-medium">${title}</h4>
+                            <p class="text-sm text-gray-500">${new Date().toISOString().split('T')[0]} • ${category}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2 py-1 text-xs rounded ${status === 'Published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${status}</span>
+                            <button onclick="deleteArticle(this, '${newArticle._id}')" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    document.getElementById('articlesList').appendChild(articleDiv);
+                    this.reset();
+                    toggleNewsForm();
+                    showNotification('Article published successfully!', 'success');
+                } else {
+                    showNotification('Failed to publish article', 'error');
+                }
+            } catch (error) {
+                showNotification('Error connecting to server', 'error');
+            }
+        });
+
+        async function deleteArticle(btn, articleId) {
+            if (articleId) {
+                try {
+                    const response = await fetch(`http://localhost:5000/api/news/${articleId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer admin-token'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        btn.closest('.flex').remove();
+                        showNotification('Article deleted!', 'success');
+                    } else {
+                        showNotification('Failed to delete article', 'error');
+                    }
+                } catch (error) {
+                    showNotification('Error connecting to server', 'error');
+                }
+            } else {
+                btn.closest('.flex').remove();
+                showNotification('Article deleted!', 'success');
+            }
+        }
+
+        // Calendar management
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('eventTitle').value;
+            const date = document.getElementById('eventDate').value;
+            const category = document.getElementById('eventCategory').value;
+            
+            if (!title || !date) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'flex justify-between items-center p-3 border rounded-lg';
+            eventDiv.innerHTML = `
+                <div>
+                    <h4 class="font-medium">${title}</h4>
+                    <p class="text-sm text-gray-500">${date} • ${category}</p>
+                </div>
+                <button onclick="deleteEvent(this)" class="text-red-600 hover:text-red-800">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            
+            document.getElementById('eventsList').appendChild(eventDiv);
+            this.reset();
+            showNotification('Event added successfully!', 'success');
+        });
+
+        function deleteEvent(btn) {
+            btn.closest('.flex').remove();
+            showNotification('Event deleted!', 'success');
+        }
+
+        // About management
+        let aboutEditing = false;
+        function toggleAboutEdit() {
+            const btn = document.getElementById('aboutEditBtn');
+            if (!aboutEditing) {
+                document.getElementById('visionView').classList.add('hidden');
+                document.getElementById('visionEdit').classList.remove('hidden');
+                document.getElementById('missionView').classList.add('hidden');
+                document.getElementById('missionEdit').classList.remove('hidden');
+                btn.innerHTML = '<i class="fas fa-save mr-2"></i>Save Changes';
+                btn.className = 'px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white';
+                aboutEditing = true;
+            } else {
+                document.getElementById('visionView').classList.remove('hidden');
+                document.getElementById('visionEdit').classList.add('hidden');
+                document.getElementById('missionView').classList.remove('hidden');
+                document.getElementById('missionEdit').classList.add('hidden');
+                btn.innerHTML = '<i class="fas fa-edit mr-2"></i>Edit Content';
+                btn.className = 'px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white';
+                aboutEditing = false;
+                showNotification('About information updated!', 'success');
+            }
+        }
+
+        // Fees management
+        document.getElementById('feesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const grade = document.getElementById('feeGrade').value;
+            const term1 = document.getElementById('term1Fee').value;
+            const term2 = document.getElementById('term2Fee').value;
+            const term3 = document.getElementById('term3Fee').value;
+            
+            if (!term1 || !term2 || !term3) {
+                showNotification('Please fill in all term fees', 'error');
+                return;
+            }
+            
+            showNotification(`Fee structure updated for ${grade}!`, 'success');
+            this.reset();
+        });
+
+        // Uniform management
+        function saveUniform(type) {
+            showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} uniform requirements saved!`, 'success');
+        }
+
+        // Contact management
+        function addPhone() {
+            const phone = document.getElementById('newPhone').value;
+            if (!phone) {
+                showNotification('Please enter a phone number', 'error');
+                return;
+            }
+            
+            const phoneDiv = document.createElement('div');
+            phoneDiv.className = 'flex items-center space-x-3';
+            phoneDiv.innerHTML = `
+                <input type="text" value="${phone}" class="flex-1 p-2 border rounded">
+                <span class="text-sm text-gray-500">Mobile</span>
+                <button onclick="deletePhone(this)" class="text-red-600 hover:text-red-800">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            document.getElementById('phonesList').appendChild(phoneDiv);
+            document.getElementById('newPhone').value = '';
+            showNotification('Phone number added!', 'success');
+        }
+
+        function deletePhone(btn) {
+            btn.closest('.flex').remove();
+            showNotification('Phone number removed!', 'success');
+        }
+
+        function saveLocation() {
+            showNotification('Location details saved!', 'success');
+        }
+
+        // Logout
+        function logout() {
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+            showNotification('Logged out successfully!', 'success');
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                z-index: 9999;
+                color: white;
+                font-weight: 600;
+                max-width: 400px;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                background-color: ${
+                    type === 'success' ? '#10b981' : 
+                    type === 'error' ? '#ef4444' : '#3b82f6'
+                };
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

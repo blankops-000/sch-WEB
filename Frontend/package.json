@@ -1,0 +1,9 @@
+{
+  "name": "riverside-academy-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Riverside Academy School Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

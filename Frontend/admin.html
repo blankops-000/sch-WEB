@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Testament School - Admin Panel</title>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+    
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #3b82f6;
+            --accent: #60a5fa;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+
+        const Router = ({ children }) => {
+            const [currentHash, setCurrentHash] = useState(window.location.hash || '#/');
+            
+            useEffect(() => {
+                const handleHashChange = () => setCurrentHash(window.location.hash || '#/');
+                window.addEventListener('hashchange', handleHashChange);
+                return () => window.removeEventListener('hashchange', handleHashChange);
+            }, []);
+            
+            return children(currentHash);
+        };
+
+        const checkAuth = () => {
+            const storedUser = localStorage.getItem('admin_user');
+            if (storedUser) {
+                try {
+                    return JSON.parse(storedUser);
+                } catch (e) {
+                    localStorage.removeItem('admin_user');
+                }
+            }
+            return null;
+        };
+        
+        const loginUser = async (username, password) => {
+            if (username.toLowerCase().trim() === 'admin' && password.trim() === 'outering2024') {
+                const userData = { id: 1, name: 'Administrator', username, role: 'admin' };
+                localStorage.setItem('admin_user', JSON.stringify(userData));
+                return { success: true, user: userData };
+            }
+            return { success: false, message: 'Invalid credentials' };
+        };
+        
+        const logoutUser = () => {
+            localStorage.removeItem('admin_user');
+            window.location.hash = '#/';
+        };
+
+        const AdminLogin = () => {
+            const [credentials, setCredentials] = useState({ username: '', password: '' });
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError('');
+                setLoading(true);
+                
+                const result = await loginUser(credentials.username, credentials.password);
+                
+                if (result.success) {
+                    window.location.hash = '#/admin';
+                } else {
+                    setError(result.message || 'Invalid credentials');
+                }
+                
+                setLoading(false);
+            };
+            
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-900 to-blue-700">
+                    <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl">
+                        <div className="text-center mb-8">
+                            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i className="fas fa-lock text-white text-2xl"></i>
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-900">Admin Login</h2>
+                            <p className="text-gray-600 mt-2">The Testament School Administration</p>
+                        </div>
+                        
+                        {error && (
+                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                                {error}
+                            </div>
+                        )}
+                        
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">Username</label>
+                                <input
+                                    type="text"
+                                    value={credentials.username}
+                                    onChange={(e) => setCredentials({...credentials, username: e.target.value})}
+                                    required
+                                    className="w-full px-4 py-3 rounded-lg border focus:border-blue-500 focus:outline-none"
+                                    placeholder="Enter username"
+                                />
+                            </div>
+                            
+                            <div className="mb-6">
+                                <label className="block text-gray-700 mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    value={credentials.password}
+                                    onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                                    required
+                                    className="w-full px-4 py-3 rounded-lg border focus:border-blue-500 focus:outline-none"
+                                    placeholder="Enter password"
+                                />
+                            </div>
+                            
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition disabled:opacity-50"
+                            >
+                                {loading ? 'Logging in...' : 'Login to Admin Panel'}
+                            </button>
+                            
+                            <div className="mt-6 text-center">
+                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
+                                    <p className="font-medium text-yellow-800 mb-1">Demo Mode:</p>
+                                    <p className="text-yellow-700 text-xs">Username: admin | Password: outering2024</p>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-8 text-center">
+                                <button 
+                                    type="button"
+                                    onClick={() => window.location.href = 'home.html'}
+                                    className="text-blue-600 hover:text-blue-800 bg-transparent border-none"
+                                >
+                                    ← Back to Website
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const AdminDashboard = () => {
+            const [user] = useState(checkAuth());
+            const [activeSection, setActiveSection] = useState('dashboard');
+            
+            const stats = [
+                { label: 'Total Students', value: '956', icon: 'users', color: 'blue' },
+                { label: 'Total Staff', value: '68', icon: 'chalkboard-teacher', color: 'green' },
+                { label: 'Active Events', value: '12', icon: 'calendar-alt', color: 'purple' },
+                { label: 'New Messages', value: '8', icon: 'envelope', color: 'yellow' }
+            ];
+            
+            const menuItems = [
+                { id: 'dashboard', label: 'Dashboard', icon: 'tachometer-alt' },
+                { id: 'academics', label: 'Academics', icon: 'graduation-cap' },
+                { id: 'news', label: 'News', icon: 'newspaper' },
+                { id: 'calendar', label: 'Calendar', icon: 'calendar-alt' },
+                { id: 'staff', label: 'Staff', icon: 'users' },
+                { id: 'policies', label: 'Policies', icon: 'file-alt' },
+                { id: 'contacts', label: 'Contacts', icon: 'envelope' }
+            ];
+            
+            const renderContent = () => {
+                switch(activeSection) {
+                    case 'academics':
+                        return <AcademicsManager />;
+                    case 'news':
+                        return <NewsManager />;
+                    case 'calendar':
+                        return <CalendarManager />;
+                    case 'staff':
+                        return <StaffManager />;
+                    case 'policies':
+                        return <PoliciesManager />;
+                    case 'contacts':
+                        return <ContactsManager />;
+                    default:
+                        const [recentActivities, setRecentActivities] = useState([
+                            {id: 1, action: 'New student enrolled', user: 'John Doe - Grade 5', time: '2 minutes ago', type: 'student', icon: 'user-plus'},
+                            {id: 2, action: 'Article published', user: 'Science Fair Results', time: '15 minutes ago', type: 'news', icon: 'newspaper'},
+                            {id: 3, action: 'Event scheduled', user: 'Parent-Teacher Meeting', time: '1 hour ago', type: 'calendar', icon: 'calendar-plus'},
+                            {id: 4, action: 'Staff updated', user: 'Sarah Johnson - Principal', time: '2 hours ago', type: 'staff', icon: 'user-edit'},
+                            {id: 5, action: 'Policy created', user: 'Academic Integrity Guidelines', time: '3 hours ago', type: 'policy', icon: 'file-alt'}
+                        ]);
+                        const quickActions = [
+                            {title: 'Add Student', desc: 'Enroll new student', icon: 'user-plus', color: 'blue', action: () => setActiveSection('academics')},
+                            {title: 'Create Event', desc: 'Schedule new event', icon: 'calendar-plus', color: 'green', action: () => setActiveSection('calendar')},
+                            {title: 'Publish News', desc: 'Write article', icon: 'newspaper', color: 'purple', action: () => setActiveSection('news')},
+                            {title: 'Add Staff', desc: 'New staff member', icon: 'user-tie', color: 'orange', action: () => setActiveSection('staff')},
+                            {title: 'View Reports', desc: 'Academic reports', icon: 'chart-bar', color: 'red', action: () => setActiveSection('academics')},
+                            {title: 'Manage Contacts', desc: 'Reply to messages', icon: 'envelope', color: 'teal', action: () => setActiveSection('contacts')}
+                        ];
+                        const clearActivity = (id) => setRecentActivities(recentActivities.filter(a => a.id !== id));
+                        return (
+                            <div>
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-2xl font-bold text-gray-900">Dashboard Overview</h2>
+                                    <div className="text-sm text-gray-500">Last updated: {new Date().toLocaleTimeString()}</div>
+                                </div>
+                                
+                                {/* Stats Cards */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                    {stats.map((stat, index) => (
+                                        <div key={index} className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm text-gray-500">{stat.label}</p>
+                                                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                                                    <div className="flex items-center mt-2">
+                                                        <span className="text-xs text-green-600 font-medium">↗ +5.2%</span>
+                                                        <span className="text-xs text-gray-500 ml-1">vs last month</span>
+                                                    </div>
+                                                </div>
+                                                <div className={`p-3 rounded-lg ${
+                                                    stat.color === 'blue' ? 'bg-blue-100' :
+                                                    stat.color === 'green' ? 'bg-green-100' :
+                                                    stat.color === 'purple' ? 'bg-purple-100' : 'bg-yellow-100'
+                                                }`}>
+                                                    <i className={`fas fa-${stat.icon} text-2xl ${
+                                                        stat.color === 'blue' ? 'text-blue-600' :
+                                                        stat.color === 'green' ? 'text-green-600' :
+                                                        stat.color === 'purple' ? 'text-purple-600' : 'text-yellow-600'
+                                                    }`}></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Quick Actions & Recent Activities */}
+                                <div className="grid lg:grid-cols-3 gap-8">
+                                    {/* Quick Actions */}
+                                    <div className="lg:col-span-2">
+                                        <div className="bg-white rounded-xl shadow p-6">
+                                            <h3 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h3>
+                                            <div className="grid md:grid-cols-3 gap-4">
+                                                {quickActions.map((action, index) => (
+                                                    <button key={index} onClick={action.action} className="p-4 border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all group">
+                                                        <div className={`w-12 h-12 rounded-lg mb-3 flex items-center justify-center ${
+                                                            action.color === 'blue' ? 'bg-blue-100 group-hover:bg-blue-200' :
+                                                            action.color === 'green' ? 'bg-green-100 group-hover:bg-green-200' :
+                                                            action.color === 'purple' ? 'bg-purple-100 group-hover:bg-purple-200' :
+                                                            action.color === 'orange' ? 'bg-orange-100 group-hover:bg-orange-200' :
+                                                            action.color === 'red' ? 'bg-red-100 group-hover:bg-red-200' :
+                                                            'bg-teal-100 group-hover:bg-teal-200'
+                                                        }`}>
+                                                            <i className={`fas fa-${action.icon} text-lg ${
+                                                                action.color === 'blue' ? 'text-blue-600' :
+                                                                action.color === 'green' ? 'text-green-600' :
+                                                                action.color === 'purple' ? 'text-purple-600' :
+                                                                action.color === 'orange' ? 'text-orange-600' :
+                                                                action.color === 'red' ? 'text-red-600' :
+                                                                'text-teal-600'
+                                                            }`}></i>
+                                                        </div>
+                                                        <h4 className="font-semibold text-gray-900 mb-1">{action.title}</h4>
+                                                        <p className="text-sm text-gray-500">{action.desc}</p>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Recent Activities */}
+                                    <div className="lg:col-span-1">
+                                        <div className="bg-white rounded-xl shadow p-6">
+                                            <div className="flex justify-between items-center mb-6">
+                                                <h3 className="text-xl font-bold text-gray-900">Recent Activities</h3>
+                                                <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</button>
+                                            </div>
+                                            <div className="space-y-4 max-h-96 overflow-y-auto">
+                                                {recentActivities.map((activity) => (
+                                                    <div key={activity.id} className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg group">
+                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                                            activity.type === 'student' ? 'bg-blue-100' :
+                                                            activity.type === 'news' ? 'bg-purple-100' :
+                                                            activity.type === 'calendar' ? 'bg-green-100' :
+                                                            activity.type === 'staff' ? 'bg-orange-100' :
+                                                            'bg-gray-100'
+                                                        }`}>
+                                                            <i className={`fas fa-${activity.icon} text-xs ${
+                                                                activity.type === 'student' ? 'text-blue-600' :
+                                                                activity.type === 'news' ? 'text-purple-600' :
+                                                                activity.type === 'calendar' ? 'text-green-600' :
+                                                                activity.type === 'staff' ? 'text-orange-600' :
+                                                                'text-gray-600'
+                                                            }`}></i>
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                                                            <p className="text-sm text-gray-600 truncate">{activity.user}</p>
+                                                            <p className="text-xs text-gray-400">{activity.time}</p>
+                                                        </div>
+                                                        <button onClick={() => clearActivity(activity.id)} className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 transition-all">
+                                                            <i className="fas fa-times text-xs"></i>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* System Status */}
+                                <div className="mt-8 grid md:grid-cols-3 gap-6">
+                                    <div className="bg-white rounded-xl shadow p-6">
+                                        <h4 className="font-bold text-gray-900 mb-4">System Status</h4>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-gray-600">Server Status</span>
+                                                <span className="flex items-center text-green-600"><div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>Online</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-gray-600">Database</span>
+                                                <span className="flex items-center text-green-600"><div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>Connected</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-gray-600">Backup</span>
+                                                <span className="flex items-center text-blue-600"><div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>Last: 2h ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded-xl shadow p-6">
+                                        <h4 className="font-bold text-gray-900 mb-4">Upcoming Events</h4>
+                                        <div className="space-y-2">
+                                            <div className="text-sm"><span className="font-medium">Parent Meeting</span><div className="text-gray-500">Tomorrow, 9:00 AM</div></div>
+                                            <div className="text-sm"><span className="font-medium">Sports Day</span><div className="text-gray-500">Friday, 8:00 AM</div></div>
+                                            <div className="text-sm"><span className="font-medium">Term Exams</span><div className="text-gray-500">Next Week</div></div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded-xl shadow p-6">
+                                        <h4 className="font-bold text-gray-900 mb-4">Pending Tasks</h4>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center text-sm"><input type="checkbox" className="mr-2" />Review Grade 9 Reports</div>
+                                            <div className="flex items-center text-sm"><input type="checkbox" className="mr-2" />Update Staff Records</div>
+                                            <div className="flex items-center text-sm"><input type="checkbox" className="mr-2" />Approve News Articles</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-gray-100 flex">
+                    <div className="w-64 bg-white shadow-lg flex flex-col">
+                        <div className="p-6 border-b">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                                    <i className="fas fa-user-shield text-white"></i>
+                                </div>
+                                <div>
+                                    <h1 className="text-lg font-bold">Admin Panel</h1>
+                                    <p className="text-sm text-gray-600">{user?.name}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <nav className="p-4 flex-1">
+                            {menuItems.map(item => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setActiveSection(item.id)}
+                                    className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition ${
+                                        activeSection === item.id 
+                                            ? 'bg-blue-100 text-blue-700 font-medium' 
+                                            : 'text-gray-600 hover:bg-gray-100'
+                                    }`}
+                                >
+                                    <i className={`fas fa-${item.icon}`}></i>
+                                    <span>{item.label}</span>
+                                </button>
+                            ))}
+                        </nav>
+                        
+                        <div className="mt-auto p-4 border-t border-gray-200">
+                            <button 
+                                onClick={() => window.location.href = 'home.html'}
+                                className="w-full px-4 py-2 text-gray-600 hover:text-gray-800 mb-2 border border-gray-300 rounded-lg"
+                            >
+                                <i className="fas fa-home mr-2"></i>View Website
+                            </button>
+                            <button 
+                                onClick={logoutUser}
+                                className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                            >
+                                <i className="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="flex-1 p-8">
+                        {renderContent()}
+                    </div>
+                </div>
+            );
+        };
+
+        const AcademicsManager = () => {
+            const [activeTab, setActiveTab] = useState('handbooks');
+            const [selectedGrade, setSelectedGrade] = useState('PP1');
+            const grades = ['PP1', 'PP2', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9'];
+            
+            return (
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Academics Management</h2>
+                    <div className="flex space-x-4 mb-6">
+                        {['handbooks', 'fees', 'uniform', 'requirements'].map(tab => (
+                            <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-2 rounded ${activeTab === tab ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>{tab.charAt(0).toUpperCase() + tab.slice(1)}</button>
+                        ))}
+                    </div>
+                    
+                    {activeTab === 'handbooks' && (
+                        <div className="bg-white rounded-xl shadow p-6">
+                            <h3 className="text-lg font-bold mb-4">Student Handbooks</h3>
+                            <div className="grid grid-cols-3 gap-2 mb-4">
+                                {grades.map((grade) => (
+                                    <button key={grade} onClick={() => setSelectedGrade(grade)} className={`p-2 rounded ${selectedGrade === grade ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}>{grade}</button>
+                                ))}
+                            </div>
+                            <div className="border-2 border-dashed border-blue-300 rounded p-8 text-center">
+                                <i className="fas fa-cloud-upload-alt text-3xl text-blue-600 mb-4"></i>
+                                <h4 className="font-bold mb-2">Upload {selectedGrade} Handbook</h4>
+                                <input type="file" accept=".pdf" className="hidden" id="handbook-upload" />
+                                <label htmlFor="handbook-upload" className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer">Choose File</label>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {activeTab === 'fees' && (
+                        <div className="space-y-6">
+                            <div className="bg-white rounded-xl shadow p-6">
+                                <h3 className="text-lg font-bold mb-4">2026 Pre & Primary School Fees Structure</h3>
+                                <p className="text-sm text-gray-600 mb-4">Fees Include: Breakfast Only</p>
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full border">
+                                        <thead><tr className="bg-gray-50"><th className="border px-4 py-2 text-left">Class</th><th className="border px-4 py-2">Term 1</th><th className="border px-4 py-2">Term 2</th><th className="border px-4 py-2">Term 3</th><th className="border px-4 py-2">Total</th></tr></thead>
+                                        <tbody>
+                                            <tr><td className="border px-4 py-2 font-medium">Play Group</td><td className="border px-4 py-2 text-center">Ksh 3,000</td><td className="border px-4 py-2 text-center">Ksh 3,000</td><td className="border px-4 py-2 text-center">Ksh 3,000</td><td className="border px-4 py-2 text-center font-bold">Ksh 9,000</td></tr>
+                                            <tr><td className="border px-4 py-2 font-medium">PP1</td><td className="border px-4 py-2 text-center">Ksh 4,500</td><td className="border px-4 py-2 text-center">Ksh 4,000</td><td className="border px-4 py-2 text-center">Ksh 4,000</td><td className="border px-4 py-2 text-center font-bold">Ksh 12,500</td></tr>
+                                            <tr><td className="border px-4 py-2 font-medium">Grade 1-6</td><td className="border px-4 py-2 text-center">Ksh 5,500</td><td className="border px-4 py-2 text-center">Ksh 5,000</td><td className="border px-4 py-2 text-center">Ksh 4,500</td><td className="border px-4 py-2 text-center font-bold">Ksh 15,000</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div className="bg-white rounded-xl shadow p-6">
+                                    <h4 className="font-bold mb-4">Other Charges</h4>
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between"><span>Interview</span><span>Ksh 300 (Once)</span></div>
+                                        <div className="flex justify-between"><span>Admission</span><span>Ksh 1,000 (Once)</span></div>
+                                        <div className="flex justify-between"><span>Assessment Book</span><span>Ksh 300 (On demand)</span></div>
+                                        <div className="flex justify-between"><span>Lunch</span><span>Ksh 1,000 (Per month)</span></div>
+                                        <div className="flex justify-between"><span>Activity Fee</span><span>Ksh 500 (Per term)</span></div>
+                                        <div className="flex justify-between"><span>Academic Trips</span><span>Varies</span></div>
+                                    </div>
+                                </div>
+                                <div className="bg-white rounded-xl shadow p-6">
+                                    <h4 className="font-bold mb-4">Payment Information</h4>
+                                    <div className="space-y-2 text-sm">
+                                        <p><strong>Paybill:</strong> 400200</p>
+                                        <p><strong>Account:</strong> 01109179517600</p>
+                                        <p><strong>Bank:</strong> Co-operative Bank, Kariobangi Branch</p>
+                                        <div className="mt-4 p-3 bg-blue-50 rounded">
+                                            <p className="text-blue-800 font-medium">Digital Learning Available</p>
+                                            <p className="text-blue-600 text-xs">Tablets & online exchange with Poland</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {activeTab === 'uniform' && (
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="bg-white rounded-xl shadow p-6">
+                                <h3 className="text-lg font-bold mb-4">Boys Uniform</h3>
+                                <div className="space-y-2 text-sm">
+                                    <p><strong>Shorts/Trousers:</strong> Charcoal Grey</p>
+                                    <p><strong>Shirt:</strong> Green Checked</p>
+                                    <p><strong>Sweater:</strong> Caterpillar green with white stripes, V-shaped</p>
+                                    <p><strong>Shoes:</strong> Black leather shoes</p>
+                                    <p><strong>Socks:</strong> Grey with blue stripes</p>
+                                    <p><strong>PE Kit:</strong> Green tracksuit with white stripes</p>
+                                    <p><strong>T-Shirt:</strong> Green or Yellow</p>
+                                </div>
+                                <div className="mt-4 p-3 bg-gray-50 rounded">
+                                    <p className="font-medium">Uniform Cost: Ksh 2,000</p>
+                                    <p className="text-sm text-gray-600">PE Kit: Ksh 1,500</p>
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-xl shadow p-6">
+                                <h3 className="text-lg font-bold mb-4">Girls Uniform</h3>
+                                <div className="space-y-2 text-sm">
+                                    <p><strong>Dress/Skirt:</strong> Green and white checked tunic/skirt</p>
+                                    <p><strong>Shirt:</strong> White blouse</p>
+                                    <p><strong>Sweater:</strong> Caterpillar green with white stripes, V-shaped</p>
+                                    <p><strong>Shoes:</strong> Black leather shoes</p>
+                                    <p><strong>Socks:</strong> White with green stripes</p>
+                                    <p><strong>PE Kit:</strong> Green tracksuit with white stripes</p>
+                                    <p><strong>T-Shirt:</strong> Green or Yellow</p>
+                                </div>
+                                <div className="mt-4 p-3 bg-gray-50 rounded">
+                                    <p className="font-medium">Uniform Cost: Ksh 2,000</p>
+                                    <p className="text-sm text-gray-600">PE Kit: Ksh 1,500</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {activeTab === 'requirements' && (
+                        <div className="bg-white rounded-xl shadow p-6">
+                            <h3 className="text-lg font-bold mb-4">New Pupils Requirements</h3>
+                            <p className="text-sm text-gray-600 mb-4">Items to bring on arrival (will be checked)</p>
+                            <div className="grid md:grid-cols-2 gap-8">
+                                <div>
+                                    <h4 className="font-medium mb-3">Documents & Stationery</h4>
+                                    <div className="space-y-1 text-sm">
+                                        <div className="flex justify-between"><span>Birth Certificate</span><span>1</span></div>
+                                        <div className="flex justify-between"><span>Exercise Books (8 ruled, 2 square)</span><span>10</span></div>
+                                        <div className="flex justify-between"><span>Pencils (Office Point)</span><span>3</span></div>
+                                        <div className="flex justify-between"><span>Sharpeners</span><span>2</span></div>
+                                        <div className="flex justify-between"><span>Crayons</span><span>1 packet</span></div>
+                                        <div className="flex justify-between"><span>Erasers (Rubber)</span><span>2</span></div>
+                                        <div className="flex justify-between"><span>Spring File</span><span>1</span></div>
+                                        <div className="flex justify-between"><span>Story Book</span><span>1</span></div>
+                                        <div className="flex justify-between"><span>NEMIS/UPI Copies</span><span>3</span></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className="font-medium mb-3">Other Items</h4>
+                                    <div className="space-y-1 text-sm">
+                                        <div className="flex justify-between"><span>Tissue Paper</span><span>3</span></div>
+                                        <div className="flex justify-between"><span>Modelling Clay</span><span>1 bar</span></div>
+                                        <div className="flex justify-between"><span>Manila Paper</span><span>4</span></div>
+                                        <div className="flex justify-between"><span>Luminous Paper</span><span>2</span></div>
+                                        <div className="flex justify-between"><span>Cup, Plate & Spoon</span><span>1 set</span></div>
+                                        <div className="flex justify-between"><span>Soap (White Wash)</span><span>1</span></div>
+                                    </div>
+                                    <div className="mt-4 p-3 bg-yellow-50 rounded">
+                                        <p className="text-yellow-800 font-medium text-sm">Important Notes:</p>
+                                        <ul className="text-yellow-700 text-xs mt-1 space-y-1">
+                                            <li>• Textbooks provided for class use only</li>
+                                            <li>• Parents buy homework textbooks</li>
+                                            <li>• Inform school of child's health status</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const NewsManager = () => {
+            const [showForm, setShowForm] = useState(false);
+            const [articles, setArticles] = useState([{id: 1, title: 'Students Win Science Competition', status: 'Published', date: '2024-01-15'}]);
+            const [formData, setFormData] = useState({title: '', content: '', category: 'Achievement'});
+            const handleSubmit = (e) => { e.preventDefault(); setArticles([{id: Date.now(), ...formData, date: new Date().toISOString().split('T')[0]}, ...articles]); setFormData({title: '', content: '', category: 'Achievement'}); setShowForm(false); };
+            return (
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">News Management</h2>
+                    <div className="bg-white rounded-xl shadow p-6 mb-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold">Articles</h3>
+                            <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-4 py-2 rounded">{showForm ? 'Cancel' : 'New Article'}</button>
+                        </div>
+                        {showForm && (
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <input type="text" placeholder="Title" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full p-3 border rounded" required />
+                                <textarea placeholder="Content" value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="w-full p-3 border rounded h-32" required />
+                                <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded">Create</button>
+                            </form>
+                        )}
+                        <div className="space-y-3">
+                            {articles.map((article) => (
+                                <div key={article.id} className="flex justify-between items-center p-3 border rounded">
+                                    <div><h4 className="font-medium">{article.title}</h4><p className="text-sm text-gray-500">{article.date}</p></div>
+                                    <button className="text-red-600"><i className="fas fa-trash"></i></button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const CalendarManager = () => {
+            const [events, setEvents] = useState([{id: 1, title: 'Mid-Term Exams', date: '2024-02-19', category: 'Academic'}]);
+            const [formData, setFormData] = useState({title: '', date: '', category: 'Academic'});
+            const handleSubmit = (e) => { e.preventDefault(); setEvents([...events, {id: Date.now(), ...formData}]); setFormData({title: '', date: '', category: 'Academic'}); };
+            return (
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Calendar Management</h2>
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="bg-white rounded-xl shadow p-6">
+                            <h3 className="text-lg font-bold mb-4">Add Event</h3>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <input type="text" placeholder="Event Title" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full p-3 border rounded" required />
+                                <input type="date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} className="w-full p-3 border rounded" required />
+                                <select value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full p-3 border rounded">
+                                    <option value="Academic">Academic</option>
+                                    <option value="Sports">Sports</option>
+                                    <option value="Cultural">Cultural</option>
+                                </select>
+                                <button type="submit" className="w-full bg-green-600 text-white p-3 rounded">Add Event</button>
+                            </form>
+                        </div>
+                        <div className="bg-white rounded-xl shadow p-6">
+                            <h3 className="text-lg font-bold mb-4">Events ({events.length})</h3>
+                            <div className="space-y-3">
+                                {events.map((event) => (
+                                    <div key={event.id} className="flex justify-between items-center p-3 border rounded">
+                                        <div><h4 className="font-medium">{event.title}</h4><p className="text-sm text-gray-500">{event.date}</p></div>
+                                        <button className="text-red-600"><i className="fas fa-trash"></i></button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const StaffManager = () => {
+            const [showForm, setShowForm] = useState(false);
+            const [staff, setStaff] = useState([{id: 1, name: 'Dr. Sarah Johnson', position: 'Principal', email: 's.johnson@school.edu'}]);
+            const [formData, setFormData] = useState({name: '', position: '', email: ''});
+            const handleSubmit = (e) => { e.preventDefault(); setStaff([...staff, {id: Date.now(), ...formData}]); setFormData({name: '', position: '', email: ''}); setShowForm(false); };
+            return (
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Staff Management</h2>
+                    <div className="bg-white rounded-xl shadow p-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold">Staff Directory ({staff.length})</h3>
+                            <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-4 py-2 rounded">{showForm ? 'Cancel' : 'Add Staff'}</button>
+                        </div>
+                        {showForm && (
+                            <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded space-y-4">
+                                <input type="text" placeholder="Name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-3 border rounded" required />
+                                <input type="text" placeholder="Position" value={formData.position} onChange={(e) => setFormData({...formData, position: e.target.value})} className="w-full p-3 border rounded" required />
+                                <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full p-3 border rounded" required />
+                                <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded">Add Staff</button>
+                            </form>
+                        )}
+                        <div className="space-y-3">
+                            {staff.map((member) => (
+                                <div key={member.id} className="flex justify-between items-center p-4 border rounded">
+                                    <div><h4 className="font-medium">{member.name}</h4><p className="text-sm text-gray-500">{member.position}</p><p className="text-sm text-gray-400">{member.email}</p></div>
+                                    <button className="text-red-600"><i className="fas fa-trash"></i></button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const PoliciesManager = () => {
+            const [policies, setPolicies] = useState([{id: 1, title: 'Academic Integrity Policy', category: 'Academic', status: 'Active'}]);
+            const [showForm, setShowForm] = useState(false);
+            const [formData, setFormData] = useState({title: '', category: 'Academic', content: ''});
+            const handleSubmit = (e) => { e.preventDefault(); setPolicies([...policies, {id: Date.now(), ...formData, status: 'Active'}]); setFormData({title: '', category: 'Academic', content: ''}); setShowForm(false); };
+            return (
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Policies Management</h2>
+                    <div className="bg-white rounded-xl shadow p-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold">Policies</h3>
+                            <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-4 py-2 rounded">{showForm ? 'Cancel' : 'Add Policy'}</button>
+                        </div>
+                        {showForm && (
+                            <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded space-y-4">
+                                <input type="text" placeholder="Policy Title" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full p-3 border rounded" required />
+                                <select value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full p-3 border rounded">
+                                    <option value="Academic">Academic</option>
+                                    <option value="Student">Student</option>
+                                    <option value="Safety">Safety</option>
+                                </select>
+                                <textarea placeholder="Content" value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="w-full p-3 border rounded h-32" required />
+                                <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded">Add Policy</button>
+                            </form>
+                        )}
+                        <div className="space-y-3">
+                            {policies.map((policy) => (
+                                <div key={policy.id} className="p-3 border rounded">
+                                    <div className="flex justify-between items-start">
+                                        <div><h4 className="font-medium">{policy.title}</h4><p className="text-sm text-gray-500">{policy.category}</p></div>
+                                        <button className="text-red-600"><i className="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ContactsManager = () => {
+            const [contacts] = useState([{id: 1, name: 'John Smith', email: 'john@example.com', subject: 'Admission Inquiry', status: 'New'}]);
+            return (
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Contacts Management</h2>
+                    <div className="bg-white rounded-xl shadow p-6">
+                        <h3 className="text-lg font-bold mb-4">Messages ({contacts.length})</h3>
+                        <div className="space-y-4">
+                            {contacts.map((contact) => (
+                                <div key={contact.id} className="p-4 border rounded">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div><h4 className="font-medium">{contact.name}</h4><p className="text-sm text-gray-500">{contact.email}</p></div>
+                                        <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">{contact.status}</span>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mb-3">Subject: {contact.subject}</p>
+                                    <div className="flex space-x-2">
+                                        <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded">Reply</button>
+                                        <button className="px-3 py-1 border text-sm rounded">View</button>
+                                        <button className="px-3 py-1 text-red-600 text-sm">Delete</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <Router>
+                    {(currentHash) => {
+                        if (currentHash === '#/admin') {
+                            const user = checkAuth();
+                            if (user) {
+                                return <AdminDashboard />;
+                            } else {
+                                window.location.hash = '#/login';
+                                return null;
+                            }
+                        } else if (currentHash === '#/login') {
+                            return <AdminLogin />;
+                        } else {
+                            return <AdminLogin />;
+                        }
+                    }}
+                </Router>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

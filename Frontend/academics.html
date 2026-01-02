@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Programs - Riverside Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <header class="bg-white shadow-md">
+            <div class="max-w-7xl mx-auto px-4 py-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white text-2xl">🎓</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Riverside Academy</h1>
+                        <p class="text-sm text-gray-600">Academic Programs</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 py-8">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Academic Programs</h1>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Discover our comprehensive educational programs designed to nurture academic excellence and personal growth
+                </p>
+            </div>
+
+            <!-- Program Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <!-- Elementary Program -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white text-center">
+                        <div class="text-6xl mb-4">🎨</div>
+                        <h3 class="text-2xl font-bold">Elementary (K-5)</h3>
+                        <p class="mt-2 opacity-90">Ages 5-11</p>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">Building strong foundations in core subjects with creative learning approaches.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Small class sizes (18-20 students)</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>STEAM integration</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Character education</li>
+                        </ul>
+                        <div class="border-t pt-4">
+                            <p class="text-sm text-gray-500 mb-2">Schedule: 8:00 AM - 3:00 PM</p>
+                            <p class="text-sm text-gray-500 mb-4">Tuition: $12,000/year</p>
+                            <button onclick="openModal('elementary')" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                Learn More
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle School Program -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white text-center">
+                        <div class="text-6xl mb-4">📚</div>
+                        <h3 class="text-2xl font-bold">Middle School (6-8)</h3>
+                        <p class="mt-2 opacity-90">Ages 11-14</p>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">Developing critical thinking and exploration through advanced curriculum.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Project-based learning</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Leadership opportunities</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Competitive sports teams</li>
+                        </ul>
+                        <div class="border-t pt-4">
+                            <p class="text-sm text-gray-500 mb-2">Schedule: 8:15 AM - 3:30 PM</p>
+                            <p class="text-sm text-gray-500 mb-4">Tuition: $14,000/year</p>
+                            <button onclick="openModal('middle')" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                Learn More
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High School Program -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
+                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-6 text-white text-center">
+                        <div class="text-6xl mb-4">🎓</div>
+                        <h3 class="text-2xl font-bold">High School (9-12)</h3>
+                        <p class="mt-2 opacity-90">Ages 14-18</p>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">College preparation and career readiness with advanced coursework.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>25+ AP courses available</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>College counseling program</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>98% college acceptance rate</li>
+                        </ul>
+                        <div class="border-t pt-4">
+                            <p class="text-sm text-gray-500 mb-2">Schedule: 8:00 AM - 3:45 PM</p>
+                            <p class="text-sm text-gray-500 mb-4">Tuition: $16,000/year</p>
+                            <button onclick="openModal('high')" class="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+                                Learn More
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Program Information -->
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                <h2 class="text-3xl font-bold text-center mb-8">Why Choose Our Programs?</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">🏆 Academic Excellence</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Rigorous curriculum aligned with state standards</li>
+                            <li>• Experienced and certified teachers</li>
+                            <li>• Small class sizes for personalized attention</li>
+                            <li>• Advanced placement and honors courses</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">🌟 Holistic Development</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Character education and values-based learning</li>
+                            <li>• Arts, music, and creative expression programs</li>
+                            <li>• Sports and physical fitness activities</li>
+                            <li>• Community service and leadership opportunities</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admission Process -->
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-8">
+                <h2 class="text-3xl font-bold text-center mb-8">Ready to Apply?</h2>
+                <div class="grid md:grid-cols-3 gap-6 text-center">
+                    <div>
+                        <div class="text-4xl mb-4">📝</div>
+                        <h3 class="text-xl font-bold mb-2">1. Submit Application</h3>
+                        <p class="opacity-90">Complete our online application form</p>
+                    </div>
+                    <div>
+                        <div class="text-4xl mb-4">🏫</div>
+                        <h3 class="text-xl font-bold mb-2">2. Campus Visit</h3>
+                        <p class="opacity-90">Schedule a tour and meet our faculty</p>
+                    </div>
+                    <div>
+                        <div class="text-4xl mb-4">🎉</div>
+                        <h3 class="text-xl font-bold mb-2">3. Join Our Family</h3>
+                        <p class="opacity-90">Begin your educational journey with us</p>
+                    </div>
+                </div>
+                <div class="text-center mt-8">
+                    <button class="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition mr-4">
+                        Apply Now
+                    </button>
+                    <button class="border-2 border-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-blue-600 transition">
+                        Schedule Visit
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="modalOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50" onclick="closeModal()">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div id="modalContent" class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <!-- Modal content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const programData = {
+            elementary: {
+                title: "Elementary Program (K-5)",
+                color: "blue",
+                icon: "🎨",
+                overview: "Our Elementary program provides a nurturing environment where young learners develop foundational skills in core subjects while exploring their creativity and curiosity.",
+                curriculum: [
+                    { subject: "Language Arts", description: "Reading, writing, phonics, and vocabulary development" },
+                    { subject: "Mathematics", description: "Number sense, problem-solving, and mathematical reasoning" },
+                    { subject: "Science", description: "Hands-on experiments and scientific inquiry" },
+                    { subject: "Social Studies", description: "Community awareness and cultural understanding" },
+                    { subject: "Arts & Music", description: "Creative expression through various mediums" },
+                    { subject: "Physical Education", description: "Motor skills development and healthy habits" }
+                ],
+                features: [
+                    "Small class sizes (18-20 students)",
+                    "STEAM integration across subjects",
+                    "Character education program",
+                    "Reading specialist support",
+                    "After-school enrichment programs",
+                    "Parent-teacher collaboration"
+                ],
+                faculty: [
+                    { name: "Ms. Sarah Johnson", role: "Elementary Principal", experience: "15 years" },
+                    { name: "Mrs. Emily Chen", role: "K-2 Lead Teacher", experience: "12 years" },
+                    { name: "Mr. David Rodriguez", role: "3-5 Lead Teacher", experience: "10 years" }
+                ],
+                schedule: "8:00 AM - 3:00 PM",
+                tuition: "$12,000/year",
+                facilities: ["Interactive whiteboards", "Science lab", "Art studio", "Library", "Playground", "Computer lab"]
+            },
+            middle: {
+                title: "Middle School Program (6-8)",
+                color: "green",
+                icon: "📚",
+                overview: "Our Middle School program challenges students with advanced curriculum while supporting their social and emotional development during these crucial years.",
+                curriculum: [
+                    { subject: "English Language Arts", description: "Literature analysis, creative writing, and communication skills" },
+                    { subject: "Advanced Mathematics", description: "Pre-algebra, algebra, and geometry foundations" },
+                    { subject: "Integrated Science", description: "Biology, chemistry, and physics exploration" },
+                    { subject: "World History", description: "Global perspectives and historical analysis" },
+                    { subject: "Foreign Language", description: "Spanish or French language immersion" },
+                    { subject: "Technology", description: "Digital literacy and coding fundamentals" }
+                ],
+                features: [
+                    "Project-based learning approach",
+                    "Leadership development programs",
+                    "Competitive sports teams",
+                    "Student government opportunities",
+                    "Peer tutoring programs",
+                    "College prep counseling"
+                ],
+                faculty: [
+                    { name: "Dr. Michael Thompson", role: "Middle School Principal", experience: "18 years" },
+                    { name: "Ms. Jennifer Park", role: "Math Department Head", experience: "14 years" },
+                    { name: "Mr. Robert Wilson", role: "Science Department Head", experience: "16 years" }
+                ],
+                schedule: "8:15 AM - 3:30 PM",
+                tuition: "$14,000/year",
+                facilities: ["Science laboratories", "Technology center", "Gymnasium", "Athletic fields", "Music room", "Maker space"]
+            },
+            high: {
+                title: "High School Program (9-12)",
+                color: "purple",
+                icon: "🎓",
+                overview: "Our High School program prepares students for college and career success through rigorous academics, leadership opportunities, and personalized guidance.",
+                curriculum: [
+                    { subject: "Advanced Placement", description: "25+ AP courses including STEM, humanities, and arts" },
+                    { subject: "Dual Enrollment", description: "College credit courses with partner universities" },
+                    { subject: "Career Pathways", description: "Specialized tracks in business, healthcare, and technology" },
+                    { subject: "Research Projects", description: "Independent study and research opportunities" },
+                    { subject: "Internships", description: "Real-world experience with local businesses" },
+                    { subject: "Global Studies", description: "International perspectives and cultural exchange" }
+                ],
+                features: [
+                    "25+ AP courses available",
+                    "College counseling program",
+                    "98% college acceptance rate",
+                    "National Honor Society chapter",
+                    "Varsity athletics programs",
+                    "Student-led organizations"
+                ],
+                faculty: [
+                    { name: "Dr. Amanda Foster", role: "High School Principal", experience: "20 years" },
+                    { name: "Mr. James Liu", role: "College Counselor", experience: "12 years" },
+                    { name: "Ms. Rachel Green", role: "AP Coordinator", experience: "15 years" }
+                ],
+                schedule: "8:00 AM - 3:45 PM",
+                tuition: "$16,000/year",
+                facilities: ["Advanced science labs", "College prep center", "Athletic complex", "Performing arts theater", "Innovation lab", "Student commons"]
+            }
+        };
+
+        function openModal(program) {
+            const data = programData[program];
+            const modal = document.getElementById('modalContent');
+            
+            modal.innerHTML = `
+                <div class="relative">
+                    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl z-10">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    
+                    <div class="bg-gradient-to-r from-${data.color}-500 to-${data.color}-600 text-white p-8 text-center">
+                        <div class="text-6xl mb-4">${data.icon}</div>
+                        <h2 class="text-3xl font-bold mb-2">${data.title}</h2>
+                        <p class="text-lg opacity-90">${data.overview}</p>
+                    </div>
+                    
+                    <div class="p-8">
+                        <!-- Quick Info -->
+                        <div class="grid md:grid-cols-2 gap-6 mb-8 p-6 bg-gray-50 rounded-lg">
+                            <div class="text-center">
+                                <i class="fas fa-clock text-${data.color}-600 text-2xl mb-2"></i>
+                                <h4 class="font-bold text-gray-900">Schedule</h4>
+                                <p class="text-gray-600">${data.schedule}</p>
+                            </div>
+                            <div class="text-center">
+                                <i class="fas fa-dollar-sign text-${data.color}-600 text-2xl mb-2"></i>
+                                <h4 class="font-bold text-gray-900">Tuition</h4>
+                                <p class="text-gray-600">${data.tuition}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Curriculum -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-book text-${data.color}-600 mr-3"></i>
+                                Curriculum
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                ${data.curriculum.map(item => `
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <h4 class="font-bold text-gray-900 mb-2">${item.subject}</h4>
+                                        <p class="text-gray-600 text-sm">${item.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Features -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-star text-${data.color}-600 mr-3"></i>
+                                Program Features
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-2">
+                                ${data.features.map(feature => `
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-3"></i>
+                                        <span class="text-gray-700">${feature}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Faculty -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-users text-${data.color}-600 mr-3"></i>
+                                Key Faculty
+                            </h3>
+                            <div class="grid md:grid-cols-3 gap-4">
+                                ${data.faculty.map(member => `
+                                    <div class="text-center p-4 border border-gray-200 rounded-lg">
+                                        <div class="w-16 h-16 bg-${data.color}-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                            <i class="fas fa-user text-${data.color}-600 text-xl"></i>
+                                        </div>
+                                        <h4 class="font-bold text-gray-900">${member.name}</h4>
+                                        <p class="text-sm text-gray-600">${member.role}</p>
+                                        <p class="text-xs text-gray-500">${member.experience} experience</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Facilities -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-building text-${data.color}-600 mr-3"></i>
+                                Facilities
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                ${data.facilities.map(facility => `
+                                    <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                        <i class="fas fa-check-circle text-${data.color}-600 mb-2"></i>
+                                        <p class="text-sm text-gray-700">${facility}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t">
+                            <button onclick="scheduleVisit('${program}')" class="flex-1 bg-${data.color}-600 text-white px-6 py-3 rounded-lg hover:bg-${data.color}-700 transition font-bold">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                Schedule Campus Visit
+                            </button>
+                            <button onclick="requestInfo('${program}')" class="flex-1 border-2 border-${data.color}-600 text-${data.color}-600 px-6 py-3 rounded-lg hover:bg-${data.color}-50 transition font-bold">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Request Information
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modalOverlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        
+        function scheduleVisit(program) {
+            alert(`Scheduling campus visit for ${programData[program].title}. You will be redirected to our scheduling system.`);
+            // In a real application, this would redirect to a scheduling system
+        }
+        
+        function requestInfo(program) {
+            alert(`Information packet for ${programData[program].title} will be sent to your email.`);
+            // In a real application, this would open a form or send an email
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

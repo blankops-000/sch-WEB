@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Testament School - Admin Panel</title>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+    
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #3b82f6;
+            --accent: #60a5fa;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+
+        const Router = ({ children }) => {
+            const [currentHash, setCurrentHash] = useState(window.location.hash || '#/');
+            
+            useEffect(() => {
+                const handleHashChange = () => setCurrentHash(window.location.hash || '#/');
+                window.addEventListener('hashchange', handleHashChange);
+                return () => window.removeEventListener('hashchange', handleHashChange);
+            }, []);
+            
+            return children(currentHash);
+        };
+
+        const checkAuth = () => {
+            const storedUser = localStorage.getItem('admin_user');
+            if (storedUser) {
+                try {
+                    return JSON.parse(storedUser);
+                } catch (e) {
+                    localStorage.removeItem('admin_user');
+                }
+            }
+            return null;
+        };
+        
+        const loginUser = async (username, password) => {
+            if (username.toLowerCase().trim() === 'admin' && password.trim() === 'outering2024') {
+                const userData = { id: 1, name: 'Administrator', username, role: 'admin' };
+                localStorage.setItem('admin_user', JSON.stringify(userData));
+                return { success: true, user: userData };
+            }
+            return { success: false, message: 'Invalid credentials' };
+        };
+        
+        const logoutUser = () => {
+            localStorage.removeItem('admin_user');
+            window.location.hash = '#/';
+        };
+
+        const AdminLogin = () => {
+            const [credentials, setCredentials] = useState({ username: '', password: '' });
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError('');
+                setLoading(true);
+                
+                const result = await loginUser(credentials.username, credentials.password);
+                
+                if (result.success) {
+                    window.location.hash = '#/admin';
+                } else {
+                    setError(result.message || 'Invalid credentials');
+                }
+                
+                setLoading(false);
+            };
+            
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-900 to-blue-700">
+                    <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl">
+                        <div className="text-center mb-8">
+                            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i className="fas fa-lock text-white text-2xl"></i>
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-900">Admin Login</h2>
+                            <p className="text-gray-600 mt-2">The Testament School Administration</p>
+                        </div>
+                        
+                        {error && (
+                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                                {error}
+                            </div>
+                        )}
+                        
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">Username</label>
+                                <input
+                                    type="text"
+                                    value={credentials.username}
+                                    onChange={(e) => setCredentials({...credentials, username: e.target.value})}
+                                    required
+                                    className="w-full px-4 py-3 rounded-lg border focus:border-blue-500 focus:outline-none"
+                                    placeholder="Enter username"
+                                />
+                            </div>
+                            
+                            <div className="mb-6">
+                                <label className="block text-gray-700 mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    value={credentials.password}
+                                    onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                                    required
+                                    className="w-full px-4 py-3 rounded-lg border focus:border-blue-500 focus:outline-none"
+                                    placeholder="Enter password"
+                                />
+                            </div>
+                            
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition disabled:opacity-50"
+                            >
+                                {loading ? 'Logging in...' : 'Login to Admin Panel'}
+                            </button>
+                            
+                            <div className="mt-6 text-center">
+                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
+                                    <p className="font-medium text-yellow-800 mb-1">Demo Mode:</p>
+                                    <p className="text-yellow-700 text-xs">Username: admin | Password: outering2024</p>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-8 text-center">
+                                <button 
+                                    type="button"
+                                    onClick={() => window.location.href = 'home.html'}
+                                    className="text-blue-600 hover:text-blue-800 bg-transparent border-none"
+                                >
+                                    ← Back to Website
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const AdminDashboard = () => {
+            const [user] = useState(checkAuth());
+            const [activeSection, setActiveSection] = useState('dashboard');
+            
+            const stats = [
+                { label: 'Total Students', value: '956', icon: 'users', color: 'blue' },
+                { label: 'Total Staff', value: '68', icon: 'chalkboard-teacher', color: 'green' },
+                { label: 'Active Events', value: '12', icon: 'calendar-alt', color: 'purple' },
+                { label: 'New Messages', value: '8', icon: 'envelope', color: 'yellow' }
+            ];
+            
+            const menuItems = [
+                { id: 'dashboard', label: 'Dashboard', icon: 'tachometer-alt' },
+                { id: 'academics', label: 'Academics', icon: 'graduation-cap' },
+                { id: 'news', label: 'News', icon: 'newspaper' },
+                { id: 'calendar', label: 'Calendar', icon: 'calendar-alt' },
+                { id: 'staff', label: 'Staff', icon: 'users' },
+                { id: 'policies', label: 'Policies', icon: 'file-alt' },
+                { id: 'contacts', label: 'Contacts', icon: 'envelope' }
+            ];
+            
+            const renderContent = () => {
+                switch(activeSection) {
+                    case 'academics':
+                        return <div className="p-8 bg-white rounded-xl"><h2 className="text-2xl font-bold">Academics Management</h2><p>Manage academic content here.</p></div>;
+                    case 'news':
+                        return <div className="p-8 bg-white rounded-xl"><h2 className="text-2xl font-bold">News Management</h2><p>Manage news articles here.</p></div>;
+                    case 'calendar':
+                        return <div className="p-8 bg-white rounded-xl"><h2 className="text-2xl font-bold">Calendar Management</h2><p>Manage school calendar here.</p></div>;
+                    case 'staff':
+                        return <div className="p-8 bg-white rounded-xl"><h2 className="text-2xl font-bold">Staff Management</h2><p>Manage staff information here.</p></div>;
+                    case 'policies':
+                        return <div className="p-8 bg-white rounded-xl"><h2 className="text-2xl font-bold">Policies Management</h2><p>Manage school policies here.</p></div>;
+                    case 'contacts':
+                        return <div className="p-8 bg-white rounded-xl"><h2 className="text-2xl font-bold">Contacts Management</h2><p>Manage contact messages here.</p></div>;
+                    default:
+                        return (
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-6">Dashboard Overview</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                    {stats.map((stat, index) => (
+                                        <div key={index} className="bg-white rounded-xl shadow p-6">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm text-gray-500">{stat.label}</p>
+                                                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                                                </div>
+                                                <div className={`p-3 rounded-lg ${
+                                                    stat.color === 'blue' ? 'bg-blue-100' :
+                                                    stat.color === 'green' ? 'bg-green-100' :
+                                                    stat.color === 'purple' ? 'bg-purple-100' : 'bg-yellow-100'
+                                                }`}>
+                                                    <i className={`fas fa-${stat.icon} text-2xl ${
+                                                        stat.color === 'blue' ? 'text-blue-600' :
+                                                        stat.color === 'green' ? 'text-green-600' :
+                                                        stat.color === 'purple' ? 'text-purple-600' : 'text-yellow-600'
+                                                    }`}></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-gray-100 flex">
+                    <div className="w-64 bg-white shadow-lg flex flex-col">
+                        <div className="p-6 border-b">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                                    <i className="fas fa-user-shield text-white"></i>
+                                </div>
+                                <div>
+                                    <h1 className="text-lg font-bold">Admin Panel</h1>
+                                    <p className="text-sm text-gray-600">{user?.name}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <nav className="p-4 flex-1">
+                            {menuItems.map(item => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setActiveSection(item.id)}
+                                    className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition ${
+                                        activeSection === item.id 
+                                            ? 'bg-blue-100 text-blue-700 font-medium' 
+                                            : 'text-gray-600 hover:bg-gray-100'
+                                    }`}
+                                >
+                                    <i className={`fas fa-${item.icon}`}></i>
+                                    <span>{item.label}</span>
+                                </button>
+                            ))}
+                        </nav>
+                        
+                        <div className="mt-auto p-4 border-t border-gray-200">
+                            <button 
+                                onClick={() => window.location.href = 'home.html'}
+                                className="w-full px-4 py-2 text-gray-600 hover:text-gray-800 mb-2 border border-gray-300 rounded-lg"
+                            >
+                                <i className="fas fa-home mr-2"></i>View Website
+                            </button>
+                            <button 
+                                onClick={logoutUser}
+                                className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                            >
+                                <i className="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="flex-1 p-8">
+                        {renderContent()}
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <Router>
+                    {(currentHash) => {
+                        if (currentHash === '#/admin') {
+                            const user = checkAuth();
+                            if (user) {
+                                return <AdminDashboard />;
+                            } else {
+                                window.location.hash = '#/login';
+                                return null;
+                            }
+                        } else if (currentHash === '#/login') {
+                            return <AdminLogin />;
+                        } else {
+                            return <AdminLogin />;
+                        }
+                    }}
+                </Router>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
