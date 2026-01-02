@@ -1,0 +1,3 @@
+git add .
+git commit -m "Fix 404 - Self-contained HTML with no external dependencies"
+git push origin main
