@@ -52,6 +52,10 @@
         let showNewsForm = false;
         let showStaffForm = false;
         let showPolicyForm = false;
+        let editingStaff = null;
+        let editingPolicy = null;
+        let editingArticle = null;
+        let editingEvent = null;
         let notifications = [];
         
         // Data storage with enhanced structure
@@ -74,20 +78,57 @@
         if (savedEvents) {
             events = JSON.parse(savedEvents);
         }
+        
+        // Handbooks storage
+        let handbooks = JSON.parse(localStorage.getItem('admin_handbooks') || '{}');
+        
+        // Handle handbook upload
+        function handleHandbookUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    handbooks[selectedGrade] = {
+                        name: file.name,
+                        data: e.target.result,
+                        uploadDate: new Date().toISOString()
+                    };
+                    localStorage.setItem('admin_handbooks', JSON.stringify(handbooks));
+                    showNotification(`${selectedGrade} handbook uploaded successfully!`);
+                    render();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showNotification('Please select a PDF file', 'error');
+            }
+        }
         let staff = [
-            {id: 1, name: 'Dr. Sarah Johnson', position: 'Principal', email: 's.johnson@school.edu', department: 'Administration', status: 'Active'},
-            {id: 2, name: 'Mr. James Wilson', position: 'Math Teacher', email: 'j.wilson@school.edu', department: 'Mathematics', status: 'Active'}
+            {id: 1, name: 'Dr. Sarah Johnson', position: 'Principal', email: 's.johnson@outeringschool.ac.ke', department: 'Administration', status: 'Active'},
+            {id: 2, name: 'Mr. James Wilson', position: 'Math Teacher', email: 'j.wilson@outeringschool.ac.ke', department: 'Mathematics', status: 'Active'},
+            {id: 3, name: 'Ms. Mary Wanjiku', position: 'English Teacher', email: 'm.wanjiku@outeringschool.ac.ke', department: 'Languages', status: 'Active'},
+            {id: 4, name: 'Mr. Peter Kimani', position: 'Science Teacher', email: 'p.kimani@outeringschool.ac.ke', department: 'Sciences', status: 'Active'},
+            {id: 5, name: 'Ms. Grace Achieng', position: 'Deputy Principal', email: 'g.achieng@outeringschool.ac.ke', department: 'Administration', status: 'Active'},
+            {id: 6, name: 'Mr. David Mwangi', position: 'Sports Coordinator', email: 'd.mwangi@outeringschool.ac.ke', department: 'Physical Education', status: 'Active'}
         ];
         let policies = [
-            {id: 1, title: 'Academic Integrity Policy', category: 'Academic', status: 'Active', lastUpdated: '2024-01-10'},
-            {id: 2, title: 'Student Code of Conduct', category: 'Student', status: 'Under Review', lastUpdated: '2024-01-05'}
-        ];
-        let contacts = [
-            {id: 1, name: 'John Smith', email: 'john@example.com', subject: 'Admission Inquiry', status: 'New', date: '2024-01-15', priority: 'High'},
-            {id: 2, name: 'Mary Johnson', email: 'mary@example.com', subject: 'Fee Payment Query', status: 'Replied', date: '2024-01-14', priority: 'Medium'}
+            {id: 1, title: 'Academic Integrity Policy', category: 'Academic', status: 'Active', lastUpdated: '2024-01-10', description: 'Guidelines for maintaining honesty and fairness in all academic work and assessments.'},
+            {id: 2, title: 'Student Code of Conduct', category: 'Student', status: 'Active', lastUpdated: '2024-01-05', description: 'Expected behavior standards for all students to ensure a safe and respectful learning environment.'},
+            {id: 3, title: 'Safety & Security Policy', category: 'Safety', status: 'Active', lastUpdated: '2024-01-15', description: 'Comprehensive safety measures and emergency procedures to protect all members of our school community.'},
+            {id: 4, title: 'Anti-Bullying Policy', category: 'Student', status: 'Active', lastUpdated: '2024-01-08', description: 'Zero-tolerance approach to bullying with clear reporting procedures and support systems.'}
         ];
         
-        const grades = ['PP1', 'PP2', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9'];
+        // Load existing data from localStorage
+        const savedStaff = localStorage.getItem('admin_staff');
+        if (savedStaff) {
+            staff = JSON.parse(savedStaff);
+        }
+        
+        const savedPolicies = localStorage.getItem('admin_policies');
+        if (savedPolicies) {
+            policies = JSON.parse(savedPolicies);
+        }
+
+        const grades = ['PP1', 'PP2', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Form 3', 'Form 4'];
         
         // Utility functions
         function showNotification(message, type = 'success') {
@@ -135,6 +176,17 @@
             render();
         };
 
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            }
+        }
+        
         // Event handlers
         function handleLogin(event) {
             event.preventDefault();
@@ -170,92 +222,185 @@
 
         function toggleNewsForm() {
             showNewsForm = !showNewsForm;
+            editingArticle = null;
             render();
         }
 
         function toggleStaffForm() {
             showStaffForm = !showStaffForm;
+            editingStaff = null;
             render();
         }
 
         function togglePolicyForm() {
             showPolicyForm = !showPolicyForm;
+            editingPolicy = null;
+            render();
+        }
+
+        function editArticle(id) {
+            editingArticle = articles.find(a => a.id === id);
+            showNewsForm = true;
+            render();
+        }
+
+        function editEvent(id) {
+            editingEvent = events.find(e => e.id === id);
+            render();
+        }
+
+        function editStaff(id) {
+            editingStaff = staff.find(s => s.id === id);
+            showStaffForm = true;
+            render();
+        }
+
+        function editPolicy(id) {
+            editingPolicy = policies.find(p => p.id === id);
+            showPolicyForm = true;
             render();
         }
 
         function handleNewsSubmit(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
-            const newArticle = {
-                id: Date.now(),
-                title: formData.get('title'),
-                content: formData.get('content'),
-                category: formData.get('category'),
-                date: new Date().toISOString().split('T')[0],
-                status: 'Published',
-                views: 0
-            };
-            articles.unshift(newArticle);
             
-            // Save to localStorage for home page
+            if (editingArticle) {
+                // Update existing article
+                const index = articles.findIndex(a => a.id === editingArticle.id);
+                articles[index] = {
+                    ...editingArticle,
+                    title: formData.get('title'),
+                    content: formData.get('content'),
+                    category: formData.get('category'),
+                    date: new Date().toISOString().split('T')[0]
+                };
+                showNotification('Article updated successfully!');
+            } else {
+                // Add new article
+                const newArticle = {
+                    id: Date.now(),
+                    title: formData.get('title'),
+                    content: formData.get('content'),
+                    category: formData.get('category'),
+                    date: new Date().toISOString().split('T')[0],
+                    status: 'Published',
+                    views: 0
+                };
+                articles.unshift(newArticle);
+                showNotification('Article published successfully!');
+            }
+            
             localStorage.setItem('admin_articles', JSON.stringify(articles));
-            
             showNewsForm = false;
-            showNotification('Article published successfully!');
+            editingArticle = null;
             render();
         }
 
         function handleEventSubmit(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
-            const newEvent = {
-                id: Date.now(),
-                title: formData.get('title'),
-                date: formData.get('date'),
-                category: formData.get('category'),
-                status: 'Upcoming'
-            };
-            events.push(newEvent);
             
-            // Save to localStorage for home page
+            if (editingEvent) {
+                // Update existing event
+                const index = events.findIndex(e => e.id === editingEvent.id);
+                events[index] = {
+                    ...editingEvent,
+                    title: formData.get('title'),
+                    date: formData.get('date'),
+                    category: formData.get('category'),
+                    description: formData.get('description') || 'Event details will be announced soon.'
+                };
+                showNotification('Event updated successfully!');
+                editingEvent = null;
+            } else {
+                // Add new event
+                const newEvent = {
+                    id: Date.now(),
+                    title: formData.get('title'),
+                    date: formData.get('date'),
+                    category: formData.get('category'),
+                    description: formData.get('description') || 'Event details will be announced soon.',
+                    status: 'Upcoming'
+                };
+                events.push(newEvent);
+                showNotification('Event created successfully!');
+            }
+            
             localStorage.setItem('admin_events', JSON.stringify(events));
-            
             event.target.reset();
-            showNotification('Event created successfully!');
             render();
         }
 
         function handleStaffSubmit(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
-            const newStaff = {
-                id: Date.now(),
-                name: formData.get('name'),
-                position: formData.get('position'),
-                email: formData.get('email'),
-                department: formData.get('department'),
-                status: 'Active'
-            };
-            staff.push(newStaff);
+            
+            if (editingStaff) {
+                // Update existing staff
+                const index = staff.findIndex(s => s.id === editingStaff.id);
+                staff[index] = {
+                    ...editingStaff,
+                    name: formData.get('name'),
+                    position: formData.get('position'),
+                    email: formData.get('email'),
+                    department: formData.get('department')
+                };
+                showNotification('Staff member updated successfully!');
+            } else {
+                // Add new staff
+                const newStaff = {
+                    id: Date.now(),
+                    name: formData.get('name'),
+                    position: formData.get('position'),
+                    email: formData.get('email'),
+                    department: formData.get('department'),
+                    status: 'Active'
+                };
+                staff.push(newStaff);
+                showNotification('Staff member added successfully!');
+            }
+            
+            localStorage.setItem('admin_staff', JSON.stringify(staff));
             showStaffForm = false;
-            showNotification('Staff member added successfully!');
+            editingStaff = null;
             render();
         }
 
         function handlePolicySubmit(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
-            const newPolicy = {
-                id: Date.now(),
-                title: formData.get('title'),
-                category: formData.get('category'),
-                content: formData.get('content'),
-                status: 'Active',
-                lastUpdated: new Date().toISOString().split('T')[0]
-            };
-            policies.push(newPolicy);
+            
+            if (editingPolicy) {
+                // Update existing policy
+                const index = policies.findIndex(p => p.id === editingPolicy.id);
+                policies[index] = {
+                    ...editingPolicy,
+                    title: formData.get('title'),
+                    category: formData.get('category'),
+                    content: formData.get('content'),
+                    description: formData.get('content'),
+                    lastUpdated: new Date().toISOString().split('T')[0]
+                };
+                showNotification('Policy updated successfully!');
+            } else {
+                // Add new policy
+                const newPolicy = {
+                    id: Date.now(),
+                    title: formData.get('title'),
+                    category: formData.get('category'),
+                    content: formData.get('content'),
+                    description: formData.get('content'),
+                    status: 'Active',
+                    lastUpdated: new Date().toISOString().split('T')[0]
+                };
+                policies.push(newPolicy);
+                showNotification('Policy added successfully!');
+            }
+            
+            localStorage.setItem('admin_policies', JSON.stringify(policies));
             showPolicyForm = false;
-            showNotification('Policy added successfully!');
+            editingPolicy = null;
             render();
         }
 
@@ -263,31 +408,26 @@
             switch(type) {
                 case 'article':
                     articles = articles.filter(a => a.id !== id);
+                    localStorage.setItem('admin_articles', JSON.stringify(articles));
                     showNotification('Article deleted');
                     break;
                 case 'event':
                     events = events.filter(e => e.id !== id);
+                    localStorage.setItem('admin_events', JSON.stringify(events));
                     showNotification('Event deleted');
                     break;
                 case 'staff':
                     staff = staff.filter(s => s.id !== id);
+                    localStorage.setItem('admin_staff', JSON.stringify(staff));
                     showNotification('Staff member removed');
                     break;
                 case 'policy':
                     policies = policies.filter(p => p.id !== id);
+                    localStorage.setItem('admin_policies', JSON.stringify(policies));
                     showNotification('Policy deleted');
                     break;
             }
             render();
-        }
-
-        function updateContactStatus(id, status) {
-            const contact = contacts.find(c => c.id === id);
-            if (contact) {
-                contact.status = status;
-                showNotification(`Contact marked as ${status.toLowerCase()}`);
-                render();
-            }
         }
 
         // Component renderers
@@ -362,108 +502,108 @@
             
             return `
                 <div class="animate-fade-in">
-                    <div class="flex justify-between items-center mb-8">
-                        <div>
-                            <h2 class="text-3xl font-bold text-gray-900">Dashboard Overview</h2>
+                    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-8">
+                        <div class="mb-4 lg:mb-0">
+                            <h2 class="text-2xl lg:text-3xl font-bold text-gray-900">Dashboard Overview</h2>
                             <p class="text-gray-600">Welcome back, ${currentUser?.name}</p>
                         </div>
-                        <div class="text-right">
+                        <div class="text-left lg:text-right">
                             <p class="text-sm text-gray-500">Last login</p>
                             <p class="font-medium">${new Date().toLocaleDateString()}</p>
                         </div>
                     </div>
                     
                     <!-- Stats Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white card-hover transition-all duration-300">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-blue-100">Total Students</p>
-                                    <p class="text-3xl font-bold">${totalStudents.toLocaleString()}</p>
-                                    <p class="text-sm text-blue-100 mt-1">+12 this month</p>
+                                    <p class="text-blue-100 text-sm">Total Students</p>
+                                    <p class="text-2xl lg:text-3xl font-bold">${totalStudents.toLocaleString()}</p>
+                                    <p class="text-xs lg:text-sm text-blue-100 mt-1">+12 this month</p>
                                 </div>
-                                <div class="p-3 rounded-lg bg-white bg-opacity-20">
-                                    <i class="fas fa-users text-2xl"></i>
+                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-users text-lg lg:text-2xl"></i>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white card-hover transition-all duration-300">
+                        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-green-100">Total Staff</p>
-                                    <p class="text-3xl font-bold">${staff.length}</p>
-                                    <p class="text-sm text-green-100 mt-1">All departments</p>
+                                    <p class="text-green-100 text-sm">Total Staff</p>
+                                    <p class="text-2xl lg:text-3xl font-bold">${staff.length}</p>
+                                    <p class="text-xs lg:text-sm text-green-100 mt-1">All departments</p>
                                 </div>
-                                <div class="p-3 rounded-lg bg-white bg-opacity-20">
-                                    <i class="fas fa-chalkboard-teacher text-2xl"></i>
+                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-chalkboard-teacher text-lg lg:text-2xl"></i>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white card-hover transition-all duration-300">
+                        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-purple-100">Revenue (KSh)</p>
-                                    <p class="text-3xl font-bold">${(totalRevenue/1000000).toFixed(1)}M</p>
-                                    <p class="text-sm text-purple-100 mt-1">This academic year</p>
+                                    <p class="text-purple-100 text-sm">Revenue (KSh)</p>
+                                    <p class="text-2xl lg:text-3xl font-bold">${(totalRevenue/1000000).toFixed(1)}M</p>
+                                    <p class="text-xs lg:text-sm text-purple-100 mt-1">This academic year</p>
                                 </div>
-                                <div class="p-3 rounded-lg bg-white bg-opacity-20">
-                                    <i class="fas fa-chart-line text-2xl"></i>
+                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-chart-line text-lg lg:text-2xl"></i>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white card-hover transition-all duration-300">
+                        <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-orange-100">Attendance</p>
-                                    <p class="text-3xl font-bold">${attendanceRate}%</p>
-                                    <p class="text-sm text-orange-100 mt-1">This week</p>
+                                    <p class="text-orange-100 text-sm">Attendance</p>
+                                    <p class="text-2xl lg:text-3xl font-bold">${attendanceRate}%</p>
+                                    <p class="text-xs lg:text-sm text-orange-100 mt-1">This week</p>
                                 </div>
-                                <div class="p-3 rounded-lg bg-white bg-opacity-20">
-                                    <i class="fas fa-calendar-check text-2xl"></i>
+                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-calendar-check text-lg lg:text-2xl"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Quick Actions -->
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6 mb-8">
+                        <h3 class="text-lg lg:text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
                         <div class="space-y-3">
-                            <button onclick="setActiveSection('news')" class="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left">
+                            <button onclick="setActiveSection('news')" class="w-full p-3 lg:p-4 border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                                        <i class="fas fa-newspaper text-purple-600"></i>
+                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                                        <i class="fas fa-newspaper text-purple-600 text-sm lg:text-base"></i>
                                     </div>
                                     <div>
-                                        <h4 class="font-semibold text-gray-900">Publish News</h4>
-                                        <p class="text-sm text-gray-500">Create new article</p>
+                                        <h4 class="font-semibold text-gray-900 text-sm lg:text-base">Publish News</h4>
+                                        <p class="text-xs lg:text-sm text-gray-500">Create new article</p>
                                     </div>
                                 </div>
                             </button>
                             
-                            <button onclick="setActiveSection('calendar')" class="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all text-left">
+                            <button onclick="setActiveSection('calendar')" class="w-full p-3 lg:p-4 border-2 border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all text-left">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                                        <i class="fas fa-calendar-plus text-green-600"></i>
+                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                                        <i class="fas fa-calendar-plus text-green-600 text-sm lg:text-base"></i>
                                     </div>
                                     <div>
-                                        <h4 class="font-semibold text-gray-900">Schedule Event</h4>
-                                        <p class="text-sm text-gray-500">Add to calendar</p>
+                                        <h4 class="font-semibold text-gray-900 text-sm lg:text-base">Schedule Event</h4>
+                                        <p class="text-xs lg:text-sm text-gray-500">Add to calendar</p>
                                     </div>
                                 </div>
                             </button>
                             
-                            <button onclick="setActiveSection('staff')" class="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition-all text-left">
+                            <button onclick="setActiveSection('staff')" class="w-full p-3 lg:p-4 border-2 border-gray-200 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition-all text-left">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                                        <i class="fas fa-user-tie text-orange-600"></i>
+                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                                        <i class="fas fa-user-tie text-orange-600 text-sm lg:text-base"></i>
                                     </div>
                                     <div>
-                                        <h4 class="font-semibold text-gray-900">Add Staff</h4>
-                                        <p class="text-sm text-gray-500">New team member</p>
+                                        <h4 class="font-semibold text-gray-900 text-sm lg:text-base">Add Staff</h4>
+                                        <p class="text-xs lg:text-sm text-gray-500">New team member</p>
                                     </div>
                                 </div>
                             </button>
@@ -471,32 +611,32 @@
                     </div>
                     
                     <!-- Recent Activity -->
-                    <div class="grid lg:grid-cols-2 gap-8">
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-xl font-bold text-gray-900 mb-4">Recent Articles</h3>
+                    <div class="grid lg:grid-cols-2 gap-6 lg:gap-8">
+                        <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                            <h3 class="text-lg lg:text-xl font-bold text-gray-900 mb-4">Recent Articles</h3>
                             <div class="space-y-3">
                                 ${articles.slice(0, 3).map(article => `
                                     <div class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                                        <div>
-                                            <h4 class="font-medium text-gray-900">${article.title}</h4>
-                                            <p class="text-sm text-gray-500">${article.date} • ${article.views} views</p>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="font-medium text-gray-900 text-sm lg:text-base truncate">${article.title}</h4>
+                                            <p class="text-xs lg:text-sm text-gray-500">${article.date} • ${article.views} views</p>
                                         </div>
-                                        <span class="px-2 py-1 text-xs rounded-full ${article.status === 'Published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${article.status}</span>
+                                        <span class="px-2 py-1 text-xs rounded-full ml-2 ${article.status === 'Published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${article.status}</span>
                                     </div>
                                 `).join('')}
                             </div>
                         </div>
                         
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-xl font-bold text-gray-900 mb-4">Upcoming Events</h3>
+                        <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                            <h3 class="text-lg lg:text-xl font-bold text-gray-900 mb-4">Upcoming Events</h3>
                             <div class="space-y-3">
                                 ${events.slice(0, 3).map(event => `
                                     <div class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                                        <div>
-                                            <h4 class="font-medium text-gray-900">${event.title}</h4>
-                                            <p class="text-sm text-gray-500">${event.date} • ${event.category}</p>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="font-medium text-gray-900 text-sm lg:text-base truncate">${event.title}</h4>
+                                            <p class="text-xs lg:text-sm text-gray-500">${event.date} • ${event.category}</p>
                                         </div>
-                                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">${event.status}</span>
+                                        <span class="px-2 py-1 text-xs rounded-full ml-2 bg-blue-100 text-blue-800">${event.status}</span>
                                     </div>
                                 `).join('')}
                             </div>
@@ -508,70 +648,33 @@
         function renderAcademics() {
             return `
                 <div class="animate-fade-in">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Academics Management</h2>
+                    <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-6">Academics Management</h2>
                     <div class="flex space-x-4 mb-6">
-                        ${['handbooks', 'fees', 'uniform', 'requirements'].map(tab => 
-                            `<button onclick="setAcademicsTab('${tab}')" class="px-4 py-2 rounded-lg font-medium transition ${academicsTab === tab ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}">${tab.charAt(0).toUpperCase() + tab.slice(1)}</button>`
-                        ).join('')}
+                        <button onclick="setAcademicsTab('handbooks')" class="px-3 lg:px-4 py-2 rounded-lg font-medium transition bg-blue-600 text-white text-sm lg:text-base">Handbooks</button>
                     </div>
                     
-                    ${academicsTab === 'handbooks' ? `
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-lg font-bold mb-4">Student Handbooks</h3>
-                            <div class="grid grid-cols-3 gap-2 mb-4">
-                                ${grades.map(grade => 
-                                    `<button onclick="setSelectedGrade('${grade}')" class="p-2 rounded transition ${selectedGrade === grade ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}">${grade}</button>`
-                                ).join('')}
-                            </div>
-                            <div class="border-2 border-dashed border-blue-300 rounded-lg p-8 text-center">
-                                <i class="fas fa-cloud-upload-alt text-4xl text-blue-600 mb-4"></i>
-                                <h4 class="font-bold mb-2">Upload ${selectedGrade} Handbook</h4>
-                                <input type="file" accept=".pdf" class="hidden" id="handbook-upload">
-                                <label for="handbook-upload" class="bg-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition">Choose File</label>
-                            </div>
+                    <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                        <h3 class="text-lg font-bold mb-4">Student Handbooks</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
+                            ${grades.map(grade => 
+                                `<button onclick="setSelectedGrade('${grade}')" class="p-2 rounded transition text-xs lg:text-sm ${selectedGrade === grade ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}">${grade}</button>`
+                            ).join('')}
                         </div>
-                    ` : ''}
-                    
-                    ${academicsTab === 'fees' ? `
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-lg font-bold mb-4">Fee Structure Management</h3>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full border">
-                                    <thead><tr class="bg-gray-50"><th class="border px-4 py-2 text-left">Class</th><th class="border px-4 py-2">Term 1</th><th class="border px-4 py-2">Term 2</th><th class="border px-4 py-2">Term 3</th><th class="border px-4 py-2">Total</th></tr></thead>
-                                    <tbody>
-                                        <tr><td class="border px-4 py-2 font-medium">Play Group</td><td class="border px-4 py-2 text-center">KSh 3,000</td><td class="border px-4 py-2 text-center">KSh 3,000</td><td class="border px-4 py-2 text-center">KSh 3,000</td><td class="border px-4 py-2 text-center font-bold">KSh 9,000</td></tr>
-                                        <tr><td class="border px-4 py-2 font-medium">PP1</td><td class="border px-4 py-2 text-center">KSh 4,500</td><td class="border px-4 py-2 text-center">KSh 4,000</td><td class="border px-4 py-2 text-center">KSh 4,000</td><td class="border px-4 py-2 text-center font-bold">KSh 12,500</td></tr>
-                                        <tr><td class="border px-4 py-2 font-medium">Grade 1-6</td><td class="border px-4 py-2 text-center">KSh 5,500</td><td class="border px-4 py-2 text-center">KSh 5,000</td><td class="border px-4 py-2 text-center">KSh 4,500</td><td class="border px-4 py-2 text-center font-bold">KSh 15,000</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    ${academicsTab === 'uniform' ? `
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div class="bg-white rounded-xl shadow-lg p-6">
-                                <h3 class="text-lg font-bold mb-4">Boys Uniform</h3>
-                                <div class="space-y-2 text-sm">
-                                    <p><strong>Shorts/Trousers:</strong> Charcoal Grey</p>
-                                    <p><strong>Shirt:</strong> Green Checked</p>
-                                    <p><strong>Sweater:</strong> Caterpillar green with white stripes</p>
-                                    <p><strong>Shoes:</strong> Black leather shoes</p>
-                                    <p><strong>Socks:</strong> Grey with blue stripes</p>
+                        <div class="border-2 border-dashed border-blue-300 rounded-lg p-6 lg:p-8 text-center">
+                            <i class="fas fa-cloud-upload-alt text-3xl lg:text-4xl text-blue-600 mb-4"></i>
+                            <h4 class="font-bold mb-2 text-sm lg:text-base">Upload ${selectedGrade} Handbook</h4>
+                            ${handbooks[selectedGrade] ? `
+                                <div class="mb-4 p-3 bg-green-50 rounded-lg">
+                                    <p class="text-green-800 font-medium text-sm lg:text-base">${handbooks[selectedGrade].name}</p>
+                                    <p class="text-green-600 text-xs lg:text-sm">Uploaded: ${new Date(handbooks[selectedGrade].uploadDate).toLocaleDateString()}</p>
                                 </div>
-                            </div>
-                            <div class="bg-white rounded-xl shadow-lg p-6">
-                                <h3 class="text-lg font-bold mb-4">Girls Uniform</h3>
-                                <div class="space-y-2 text-sm">
-                                    <p><strong>Dress/Skirt:</strong> Green and white checked tunic</p>
-                                    <p><strong>Shirt:</strong> White blouse</p>
-                                    <p><strong>Sweater:</strong> Caterpillar green with white stripes</p>
-                                    <p><strong>Shoes:</strong> Black leather shoes</p>
-                                    <p><strong>Socks:</strong> White with green stripes</p>
-                                </div>
-                            </div>
+                            ` : ''}
+                            <input type="file" accept=".pdf" class="hidden" id="handbook-upload" onchange="handleHandbookUpload(event)">
+                            <label for="handbook-upload" class="bg-blue-600 text-white px-4 lg:px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition text-sm lg:text-base">
+                                ${handbooks[selectedGrade] ? 'Replace File' : 'Choose File'}
+                            </label>
                         </div>
-                    ` : ''}
+                    </div>
                 </div>
             `;
         }
@@ -590,15 +693,15 @@
                         
                         ${showNewsForm ? `
                             <form onsubmit="handleNewsSubmit(event)" class="bg-gray-50 rounded-lg p-6 mb-6 space-y-4">
-                                <input type="text" name="title" placeholder="Article Title" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
-                                <textarea name="content" placeholder="Article Content" class="w-full p-3 border rounded-lg h-32 focus:border-blue-500 focus:outline-none" required></textarea>
+                                <input type="text" name="title" placeholder="Article Title" value="${editingArticle ? editingArticle.title : ''}" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <textarea name="content" placeholder="Article Content" class="w-full p-3 border rounded-lg h-32 focus:border-blue-500 focus:outline-none" required>${editingArticle ? editingArticle.content : ''}</textarea>
                                 <select name="category" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none">
-                                    <option value="Achievement">Achievement</option>
-                                    <option value="Event">Event</option>
-                                    <option value="Announcement">Announcement</option>
+                                    <option value="Achievement" ${editingArticle && editingArticle.category === 'Achievement' ? 'selected' : ''}>Achievement</option>
+                                    <option value="Event" ${editingArticle && editingArticle.category === 'Event' ? 'selected' : ''}>Event</option>
+                                    <option value="Announcement" ${editingArticle && editingArticle.category === 'Announcement' ? 'selected' : ''}>Announcement</option>
                                 </select>
                                 <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
-                                    <i class="fas fa-save mr-2"></i>Publish Article
+                                    <i class="fas fa-save mr-2"></i>${editingArticle ? 'Update' : 'Publish'} Article
                                 </button>
                             </form>
                         ` : ''}
@@ -614,9 +717,14 @@
                                             <span class="px-2 py-1 rounded-full text-xs ${article.status === 'Published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${article.status}</span>
                                         </div>
                                     </div>
-                                    <button onclick="deleteItem('article', ${article.id})" class="text-red-600 hover:text-red-800 p-2">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="editArticle(${article.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteItem('article', ${article.id})" class="text-red-600 hover:text-red-800 p-2">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
@@ -633,17 +741,21 @@
                         <div class="bg-white rounded-xl shadow-lg p-6">
                             <h3 class="text-lg font-bold mb-4">Add New Event</h3>
                             <form onsubmit="handleEventSubmit(event)" class="space-y-4">
-                                <input type="text" name="title" placeholder="Event Title" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
-                                <input type="date" name="date" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <input type="text" name="title" placeholder="Event Title" value="${editingEvent ? editingEvent.title : ''}" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <input type="date" name="date" value="${editingEvent ? editingEvent.date : ''}" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
                                 <select name="category" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none">
-                                    <option value="Academic">Academic</option>
-                                    <option value="Sports">Sports</option>
-                                    <option value="Cultural">Cultural</option>
-                                    <option value="Administrative">Administrative</option>
+                                    <option value="Academic" ${editingEvent && editingEvent.category === 'Academic' ? 'selected' : ''}>Academic</option>
+                                    <option value="Sports" ${editingEvent && editingEvent.category === 'Sports' ? 'selected' : ''}>Sports</option>
+                                    <option value="Cultural" ${editingEvent && editingEvent.category === 'Cultural' ? 'selected' : ''}>Cultural</option>
+                                    <option value="Administrative" ${editingEvent && editingEvent.category === 'Administrative' ? 'selected' : ''}>Administrative</option>
                                 </select>
+                                <textarea name="description" placeholder="Event Description (optional)" class="w-full p-3 border rounded-lg h-24 focus:border-blue-500 focus:outline-none">${editingEvent ? editingEvent.description || '' : ''}</textarea>
                                 <button type="submit" class="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">
-                                    <i class="fas fa-plus mr-2"></i>Add Event
+                                    <i class="fas fa-plus mr-2"></i>${editingEvent ? 'Update' : 'Add'} Event
                                 </button>
+                                ${editingEvent ? `<button type="button" onclick="editingEvent = null; render()" class="w-full bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition mt-2">
+                                    <i class="fas fa-times mr-2"></i>Cancel Edit
+                                </button>` : ''}
                             </form>
                         </div>
                         
@@ -659,9 +771,14 @@
                                                 <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">${event.category}</span>
                                             </div>
                                         </div>
-                                        <button onclick="deleteItem('event', ${event.id})" class="text-red-600 hover:text-red-800 p-2">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="editEvent(${event.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteItem('event', ${event.id})" class="text-red-600 hover:text-red-800 p-2">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -686,15 +803,15 @@
                         ${showStaffForm ? `
                             <form onsubmit="handleStaffSubmit(event)" class="bg-gray-50 rounded-lg p-6 mb-6 space-y-4">
                                 <div class="grid md:grid-cols-2 gap-4">
-                                    <input type="text" name="name" placeholder="Full Name" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
-                                    <input type="text" name="position" placeholder="Position" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                    <input type="text" name="name" placeholder="Full Name" value="${editingStaff ? editingStaff.name : ''}" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                    <input type="text" name="position" placeholder="Position" value="${editingStaff ? editingStaff.position : ''}" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
                                 </div>
                                 <div class="grid md:grid-cols-2 gap-4">
-                                    <input type="email" name="email" placeholder="Email Address" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
-                                    <input type="text" name="department" placeholder="Department" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                    <input type="email" name="email" placeholder="Email Address" value="${editingStaff ? editingStaff.email : ''}" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                    <input type="text" name="department" placeholder="Department" value="${editingStaff ? editingStaff.department : ''}" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
                                 </div>
                                 <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
-                                    <i class="fas fa-save mr-2"></i>Add Staff Member
+                                    <i class="fas fa-save mr-2"></i>${editingStaff ? 'Update' : 'Add'} Staff Member
                                 </button>
                             </form>
                         ` : ''}
@@ -714,6 +831,9 @@
                                     </div>
                                     <div class="flex items-center space-x-2">
                                         <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">${member.status}</span>
+                                        <button onclick="editStaff(${member.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
                                         <button onclick="deleteItem('staff', ${member.id})" class="text-red-600 hover:text-red-800 p-2">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -740,16 +860,16 @@
                         
                         ${showPolicyForm ? `
                             <form onsubmit="handlePolicySubmit(event)" class="bg-gray-50 rounded-lg p-6 mb-6 space-y-4">
-                                <input type="text" name="title" placeholder="Policy Title" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <input type="text" name="title" placeholder="Policy Title" value="${editingPolicy ? editingPolicy.title : ''}" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
                                 <select name="category" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none">
-                                    <option value="Academic">Academic</option>
-                                    <option value="Student">Student Conduct</option>
-                                    <option value="Safety">Safety & Security</option>
-                                    <option value="Administrative">Administrative</option>
+                                    <option value="Academic" ${editingPolicy && editingPolicy.category === 'Academic' ? 'selected' : ''}>Academic</option>
+                                    <option value="Student" ${editingPolicy && editingPolicy.category === 'Student' ? 'selected' : ''}>Student Conduct</option>
+                                    <option value="Safety" ${editingPolicy && editingPolicy.category === 'Safety' ? 'selected' : ''}>Safety & Security</option>
+                                    <option value="Administrative" ${editingPolicy && editingPolicy.category === 'Administrative' ? 'selected' : ''}>Administrative</option>
                                 </select>
-                                <textarea name="content" placeholder="Policy Content" class="w-full p-3 border rounded-lg h-32 focus:border-blue-500 focus:outline-none" required></textarea>
+                                <textarea name="content" placeholder="Policy Description" class="w-full p-3 border rounded-lg h-32 focus:border-blue-500 focus:outline-none" required>${editingPolicy ? editingPolicy.description || editingPolicy.content || '' : ''}</textarea>
                                 <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
-                                    <i class="fas fa-save mr-2"></i>Add Policy
+                                    <i class="fas fa-save mr-2"></i>${editingPolicy ? 'Update' : 'Add'} Policy
                                 </button>
                             </form>
                         ` : ''}
@@ -765,49 +885,16 @@
                                                 <span><i class="fas fa-calendar mr-1"></i>Updated: ${policy.lastUpdated}</span>
                                                 <span class="px-2 py-1 rounded-full text-xs ${policy.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${policy.status}</span>
                                             </div>
+                                            ${policy.description ? `<p class="text-sm text-gray-600 mt-2">${policy.description}</p>` : ''}
                                         </div>
-                                        <button onclick="deleteItem('policy', ${policy.id})" class="text-red-600 hover:text-red-800 p-2">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderContacts() {
-            return `
-                <div class="animate-fade-in">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Contact Messages</h2>
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-lg font-bold mb-4">Inbox (${contacts.length})</h3>
-                        <div class="space-y-4">
-                            ${contacts.map(contact => `
-                                <div class="p-4 border rounded-lg hover:bg-gray-50 transition">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <div class="flex-1">
-                                            <div class="flex items-center space-x-3">
-                                                <h4 class="font-medium text-gray-900">${contact.name}</h4>
-                                                <span class="px-2 py-1 text-xs rounded-full ${contact.priority === 'High' ? 'bg-red-100 text-red-800' : contact.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">${contact.priority}</span>
-                                                <span class="px-2 py-1 text-xs rounded-full ${contact.status === 'New' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}">${contact.status}</span>
-                                            </div>
-                                            <p class="text-sm text-gray-500 mt-1">${contact.email} • ${contact.date}</p>
-                                            <p class="text-sm text-gray-600 mt-2">Subject: ${contact.subject}</p>
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="editPolicy(${policy.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteItem('policy', ${policy.id})" class="text-red-600 hover:text-red-800 p-2">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </div>
-                                    </div>
-                                    <div class="flex space-x-2">
-                                        <button onclick="updateContactStatus(${contact.id}, 'Replied')" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition">
-                                            <i class="fas fa-reply mr-1"></i>Reply
-                                        </button>
-                                        <button onclick="updateContactStatus(${contact.id}, 'Resolved')" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition">
-                                            <i class="fas fa-check mr-1"></i>Resolve
-                                        </button>
-                                        <button onclick="deleteItem('contact', ${contact.id})" class="px-3 py-1 text-red-600 text-sm hover:text-red-800 transition">
-                                            <i class="fas fa-trash mr-1"></i>Delete
-                                        </button>
                                     </div>
                                 </div>
                             `).join('')}
@@ -824,17 +911,35 @@
                 case 'calendar': return renderCalendar();
                 case 'staff': return renderStaff();
                 case 'policies': return renderPolicies();
-                case 'contacts': return renderContacts();
                 default: return renderDashboard();
             }
         }
 
         function renderMainLayout() {
             return `
-                <div class="min-h-screen bg-gray-50 flex">
+                <div class="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
+                    <!-- Mobile Header -->
+                    <div class="lg:hidden bg-white shadow-lg p-4 flex justify-between items-center">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-lg font-bold text-gray-900">Admin Panel</h1>
+                                <p class="text-xs text-gray-600">${currentUser?.name}</p>
+                            </div>
+                        </div>
+                        <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Mobile Menu Overlay -->
+                    <div id="mobileMenuOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden lg:hidden" onclick="toggleMobileMenu()"></div>
+                    
                     <!-- Sidebar -->
-                    <div class="w-64 bg-white shadow-xl flex flex-col">
-                        <div class="p-6 border-b border-gray-200">
+                    <div id="sidebar" class="w-64 bg-white shadow-xl flex flex-col fixed lg:relative inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-50 lg:z-auto">
+                        <div class="p-6 border-b border-gray-200 hidden lg:block">
                             <div class="flex items-center space-x-3">
                                 <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
                                     <i class="fas fa-graduation-cap text-white text-xl"></i>
@@ -846,17 +951,16 @@
                             </div>
                         </div>
                         
-                        <nav class="p-4 flex-1">
+                        <nav class="p-4 flex-1 overflow-y-auto">
                             ${[
                                 {id: 'dashboard', label: 'Dashboard', icon: 'tachometer-alt'},
                                 {id: 'academics', label: 'Academics', icon: 'graduation-cap'},
                                 {id: 'news', label: 'News', icon: 'newspaper'},
                                 {id: 'calendar', label: 'Calendar', icon: 'calendar-alt'},
                                 {id: 'staff', label: 'Staff', icon: 'users'},
-                                {id: 'policies', label: 'Policies', icon: 'file-alt'},
-                                {id: 'contacts', label: 'Messages', icon: 'envelope'}
+                                {id: 'policies', label: 'Policies', icon: 'file-alt'}
                             ].map(item => `
-                                <button onclick="setActiveSection('${item.id}')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl mb-2 flex items-center space-x-3 transition-all duration-200 ${activeSection === item.id ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium shadow-lg' : 'text-gray-600 hover:bg-gray-100'}">
+                                <button onclick="setActiveSection('${item.id}'); toggleMobileMenu()" class="sidebar-item w-full text-left px-4 py-3 rounded-xl mb-2 flex items-center space-x-3 transition-all duration-200 ${activeSection === item.id ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium shadow-lg' : 'text-gray-600 hover:bg-gray-100'}">
                                     <i class="fas fa-${item.icon} text-lg"></i>
                                     <span>${item.label}</span>
                                 </button>
@@ -864,17 +968,17 @@
                         </nav>
                         
                         <div class="mt-auto p-4 border-t border-gray-200 space-y-2">
-                            <button onclick="window.location.href = 'home.html'" class="w-full px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                            <button onclick="window.location.href = 'home.html'" class="w-full px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
                                 <i class="fas fa-home mr-2"></i>View Website
                             </button>
-                            <button onclick="logoutUser()" class="w-full px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition">
+                            <button onclick="logoutUser()" class="w-full px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition text-sm">
                                 <i class="fas fa-sign-out-alt mr-2"></i>Logout
                             </button>
                         </div>
                     </div>
                     
                     <!-- Main Content -->
-                    <div class="flex-1 p-8 overflow-y-auto">
+                    <div class="flex-1 p-4 lg:p-8 overflow-y-auto">
                         ${renderContent()}
                     </div>
                 </div>

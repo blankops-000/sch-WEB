@@ -59,6 +59,9 @@
                     <a href="#fees" class="hover:text-yellow-300 transition">Fees</a>
                     <a href="#application" class="hover:text-yellow-300 transition">Apply Now</a>
                     <a href="#careers" class="hover:text-yellow-300 transition">Careers</a>
+                    <a href="#staff" class="hover:text-yellow-300 transition">Staff</a>
+                    <a href="#policies" class="hover:text-yellow-300 transition">Policies</a>
+                    <a href="#handbooks" class="hover:text-yellow-300 transition">Handbooks</a>
                     <a href="#contact" class="hover:text-yellow-300 transition">Contact</a>
                     <a href="admin.html" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition">
                         <i class="fas fa-user-shield mr-2"></i>Admin
@@ -78,6 +81,9 @@
                     <a href="#fees" class="hover:text-yellow-300 transition">Fees</a>
                     <a href="#application" class="hover:text-yellow-300 transition">Apply Now</a>
                     <a href="#careers" class="hover:text-yellow-300 transition">Careers</a>
+                    <a href="#staff" class="hover:text-yellow-300 transition">Staff</a>
+                    <a href="#policies" class="hover:text-yellow-300 transition">Policies</a>
+                    <a href="#handbooks" class="hover:text-yellow-300 transition">Handbooks</a>
                     <a href="#contact" class="hover:text-yellow-300 transition">Contact</a>
                     <a href="admin.html" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition inline-block">
                         <i class="fas fa-user-shield mr-2"></i>Admin
@@ -1111,6 +1117,48 @@
         </div>
     </section>
 
+    <!-- Staff Section -->
+    <section id="staff" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Our Staff</h2>
+                <p class="text-xl text-gray-600">Meet our dedicated team of educators</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="staffContainer">
+                <!-- Staff will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Policies Section -->
+    <section id="policies" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">School Policies</h2>
+                <p class="text-xl text-gray-600">Our guidelines for a safe and productive learning environment</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8" id="policiesContainer">
+                <!-- Policies will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Handbooks Section -->
+    <section id="handbooks" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Student Handbooks</h2>
+                <p class="text-xl text-gray-600">Download grade-specific handbooks and resources</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6" id="handbooksContainer">
+                <!-- Handbooks will be loaded here -->
+            </div>
+        </div>
+    </section>
+
     <!-- Partners Section -->
     <section id="partners" class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4">
@@ -1625,10 +1673,186 @@
             }
         }
         
+        // Load staff from admin panel
+        function loadStaff() {
+            const adminStaff = JSON.parse(localStorage.getItem('admin_staff') || '[]');
+            
+            const defaultStaff = [
+                { name: 'Dr. Sarah Johnson', position: 'Principal', department: 'Administration' },
+                { name: 'Mr. James Wilson', position: 'Math Teacher', department: 'Mathematics' },
+                { name: 'Ms. Mary Wanjiku', position: 'English Teacher', department: 'Languages' },
+                { name: 'Mr. Peter Kimani', position: 'Science Teacher', department: 'Sciences' },
+                { name: 'Ms. Grace Achieng', position: 'Deputy Principal', department: 'Administration' },
+                { name: 'Mr. David Mwangi', position: 'Sports Coordinator', department: 'Physical Education' }
+            ];
+            
+            // Use admin staff if available, otherwise use defaults
+            const allStaff = adminStaff.length > 0 ? adminStaff : defaultStaff;
+            
+            const staffContainer = document.getElementById('staffContainer');
+            if (staffContainer) {
+                staffContainer.innerHTML = allStaff.map(member => `
+                    <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+                        <div class="flex items-center mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-user text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900">${member.name}</h3>
+                                <p class="text-green-600 font-medium">${member.position}</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-gray-600"><i class="fas fa-building text-green-500 mr-2"></i>${member.department}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Load handbooks from admin panel
+        function loadHandbooks() {
+            const grades = ['PP1', 'PP2', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Form 3', 'Form 4'];
+            const adminHandbooks = JSON.parse(localStorage.getItem('admin_handbooks') || '{}');
+            
+            const handbooksContainer = document.getElementById('handbooksContainer');
+            if (handbooksContainer) {
+                handbooksContainer.innerHTML = grades.map(grade => {
+                    const hasHandbook = adminHandbooks[grade];
+                    return `
+                        <div class="bg-white rounded-xl p-6 shadow-lg card-hover border-l-4 border-blue-500">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                    <i class="fas fa-book text-blue-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900">${grade}</h3>
+                                    <p class="text-sm text-gray-500">Student Handbook</p>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                ${hasHandbook ? `
+                                    <button onclick="downloadHandbook('${grade}')" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-medium">
+                                        <i class="fas fa-download mr-2"></i>Download PDF
+                                    </button>
+                                    <p class="text-xs text-gray-500 text-center">${hasHandbook.name}</p>
+                                ` : `
+                                    <button class="w-full bg-gray-400 text-white py-2 px-4 rounded-lg cursor-not-allowed font-medium" disabled>
+                                        <i class="fas fa-download mr-2"></i>Download PDF
+                                    </button>
+                                    <p class="text-xs text-gray-500 text-center">Coming Soon</p>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        // Download handbook function
+        function downloadHandbook(grade) {
+            const adminHandbooks = JSON.parse(localStorage.getItem('admin_handbooks') || '{}');
+            const handbook = adminHandbooks[grade];
+            if (handbook) {
+                const link = document.createElement('a');
+                link.href = handbook.data;
+                link.download = handbook.name;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+        
+        // Load policies from admin panel
+        function loadPolicies() {
+            const adminPolicies = JSON.parse(localStorage.getItem('admin_policies') || '[]');
+            
+            const defaultPolicies = [
+                { 
+                    title: 'Academic Integrity Policy', 
+                    category: 'Academic', 
+                    description: 'Guidelines for maintaining honesty and fairness in all academic work and assessments.',
+                    lastUpdated: '2024-01-10'
+                },
+                { 
+                    title: 'Student Code of Conduct', 
+                    category: 'Student', 
+                    description: 'Expected behavior standards for all students to ensure a safe and respectful learning environment.',
+                    lastUpdated: '2024-01-05'
+                },
+                { 
+                    title: 'Safety & Security Policy', 
+                    category: 'Safety', 
+                    description: 'Comprehensive safety measures and emergency procedures to protect all members of our school community.',
+                    lastUpdated: '2024-01-15'
+                },
+                { 
+                    title: 'Anti-Bullying Policy', 
+                    category: 'Student', 
+                    description: 'Zero-tolerance approach to bullying with clear reporting procedures and support systems.',
+                    lastUpdated: '2024-01-08'
+                }
+            ];
+            
+            // Use admin policies if available, otherwise use defaults
+            const allPolicies = adminPolicies.length > 0 ? adminPolicies : defaultPolicies;
+            
+            const categoryColors = {
+                Academic: 'bg-blue-50 border-blue-200 text-blue-800',
+                Student: 'bg-green-50 border-green-200 text-green-800',
+                Safety: 'bg-red-50 border-red-200 text-red-800',
+                Administrative: 'bg-purple-50 border-purple-200 text-purple-800'
+            };
+            
+            const policiesContainer = document.getElementById('policiesContainer');
+            if (policiesContainer) {
+                policiesContainer.innerHTML = allPolicies.map(policy => `
+                    <div class="bg-white rounded-xl p-6 shadow-lg card-hover border-l-4 border-green-500">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-bold text-gray-900">${policy.title}</h3>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium ${categoryColors[policy.category] || 'bg-gray-50 border-gray-200 text-gray-800'} border">
+                                ${policy.category}
+                            </span>
+                        </div>
+                        <p class="text-gray-600 mb-4">${policy.description || 'Policy details available in the admin panel.'}</p>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span><i class="fas fa-calendar mr-1"></i>Updated: ${policy.lastUpdated}</span>
+                            <button class="text-green-600 hover:text-green-800 font-medium">
+                                <i class="fas fa-eye mr-1"></i>View Details
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
         // Load news when page loads
         document.addEventListener('DOMContentLoaded', () => {
             loadNews();
             loadEvents();
+            loadStaff();
+            loadPolicies();
+            loadHandbooks();
+        });
+        
+        // Refresh data when page becomes visible (in case admin panel updated data)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                loadNews();
+                loadEvents();
+                loadStaff();
+                loadPolicies();
+                loadHandbooks();
+            }
+        });
+        
+        // Also refresh when window gains focus
+        window.addEventListener('focus', () => {
+            loadNews();
+            loadEvents();
+            loadStaff();
+            loadPolicies();
+            loadHandbooks();
         });
         
         // Smooth scrolling for navigation links
