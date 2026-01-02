@@ -10,6 +10,30 @@
         .gradient-bg { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
         .card-hover { transition: all 0.3s ease; }
         .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .hero-stats { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+            .mobile-text-sm { font-size: 0.875rem; }
+            .mobile-text-base { font-size: 1rem; }
+            .mobile-text-lg { font-size: 1.125rem; }
+            .mobile-text-xl { font-size: 1.25rem; }
+            .mobile-text-2xl { font-size: 1.5rem; }
+            .mobile-text-3xl { font-size: 1.875rem; }
+            .mobile-px-4 { padding-left: 1rem; padding-right: 1rem; }
+            .mobile-py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+            .mobile-py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+            .mobile-mb-6 { margin-bottom: 1.5rem; }
+            .mobile-mb-8 { margin-bottom: 2rem; }
+            .mobile-gap-4 { gap: 1rem; }
+            .mobile-gap-6 { gap: 1.5rem; }
+        }
+        
+        @media (max-width: 640px) {
+            .hero-stats { grid-template-columns: 1fr; }
+            .mobile-btn { padding: 0.75rem 1.5rem; font-size: 0.875rem; }
+            .mobile-card-p { padding: 1rem; }
+        }
     </style>
 </head>
 <body class="font-sans">
@@ -40,30 +64,49 @@
                         <i class="fas fa-user-shield mr-2"></i>Admin
                     </a>
                 </nav>
+                <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-4">
+                <div class="flex flex-col space-y-3">
+                    <a href="#home" class="hover:text-yellow-300 transition">Home</a>
+                    <a href="#about" class="hover:text-yellow-300 transition">About</a>
+                    <a href="#academics" class="hover:text-yellow-300 transition">Academics</a>
+                    <a href="#news" class="hover:text-yellow-300 transition">News</a>
+                    <a href="#calendar" class="hover:text-yellow-300 transition">Calendar</a>
+                    <a href="#fees" class="hover:text-yellow-300 transition">Fees</a>
+                    <a href="#application" class="hover:text-yellow-300 transition">Apply Now</a>
+                    <a href="#careers" class="hover:text-yellow-300 transition">Careers</a>
+                    <a href="#contact" class="hover:text-yellow-300 transition">Contact</a>
+                    <a href="admin.html" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition inline-block">
+                        <i class="fas fa-user-shield mr-2"></i>Admin
+                    </a>
+                </div>
             </div>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section id="home" class="gradient-bg text-white py-20">
+    <section id="home" class="gradient-bg text-white py-12 md:py-20">
         <div class="max-w-7xl mx-auto px-4 text-center">
-            <h2 class="text-5xl font-bold mb-6">Welcome to Outering School</h2>
-            <p class="text-xl mb-8 max-w-3xl mx-auto">Grade 10 Approved School & KCSE Centre - Day School for Both Boys and Girls</p>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4 md:mb-6">Welcome to Outering School</h2>
+            <p class="text-lg md:text-xl mb-6 md:mb-8 max-w-3xl mx-auto">Grade 10 Approved School & KCSE Centre - Day School for Both Boys and Girls</p>
+            <div class="hero-stats grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8 md:mt-12">
                 <div class="text-center">
-                    <div class="text-3xl font-bold">800+</div>
+                    <div class="text-2xl md:text-3xl font-bold">800+</div>
                     <div class="text-sm opacity-90">Students</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-3xl font-bold">45+</div>
+                    <div class="text-2xl md:text-3xl font-bold">45+</div>
                     <div class="text-sm opacity-90">Faculty</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-3xl font-bold">KCSE</div>
+                    <div class="text-2xl md:text-3xl font-bold">KCSE</div>
                     <div class="text-sm opacity-90">Centre</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-3xl font-bold">2026</div>
+                    <div class="text-2xl md:text-3xl font-bold">2026</div>
                     <div class="text-sm opacity-90">Interviews</div>
                 </div>
             </div>
@@ -191,8 +234,8 @@
     <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4">
             <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">Our Alumni Network</h2>
-                <p class="text-xl text-gray-600">Proud graduates making a difference in the world</p>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Join Our Alumni Network</h2>
+                <p class="text-xl text-gray-600">Stay connected with fellow graduates and be part of our growing community</p>
             </div>
             
             <div class="grid md:grid-cols-3 gap-8 mb-8">
@@ -222,7 +265,7 @@
             </div>
             
             <div class="text-center">
-                <button class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition font-semibold">
+                <button onclick="joinAlumni()" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition font-semibold">
                     Join Alumni Network
                 </button>
             </div>
@@ -336,69 +379,10 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="text-center mt-12">
-                <button class="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors shadow-lg">
-                    <i class="fas fa-paper-plane mr-2"></i>
-                    Start Application Process
-                </button>
-                <p class="text-gray-600 mt-4">Need help? Contact our admissions office at <a href="tel:+254722225019" class="text-green-600 hover:underline">+254 722 225 019</a></p>
-            </div>
         </div>
     </section>
 
-    <!-- Resources Section -->
-    <section class="py-16 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">Resources</h2>
-                <p class="text-xl text-gray-600">Educational programs and learning materials</p>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="bg-white rounded-xl p-8 shadow-lg card-hover">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                        <i class="fas fa-book-open text-blue-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Programs</h3>
-                    <ul class="space-y-3 text-gray-600 mb-6">
-                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>8-4-4 Curriculum</li>
-                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>Competency-Based Education (CBE)</li>
-                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>STEM Programs</li>
-                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>Sports & Recreation</li>
-                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>Amani Peace Club</li>
-                    </ul>
-                    <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                        View Programs
-                    </button>
-                </div>
-                
-                <div class="bg-white rounded-xl p-8 shadow-lg card-hover">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                        <i class="fas fa-blog text-green-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Educational Blog</h3>
-                    <div class="space-y-4 mb-6">
-                        <div class="border-l-4 border-green-500 pl-4">
-                            <h4 class="font-semibold text-gray-900">Study Tips for KCSE Success</h4>
-                            <p class="text-sm text-gray-500">January 15, 2024</p>
-                        </div>
-                        <div class="border-l-4 border-blue-500 pl-4">
-                            <h4 class="font-semibold text-gray-900">Parent-Teacher Partnership</h4>
-                            <p class="text-sm text-gray-500">January 10, 2024</p>
-                        </div>
-                        <div class="border-l-4 border-purple-500 pl-4">
-                            <h4 class="font-semibold text-gray-900">Building Character in Students</h4>
-                            <p class="text-sm text-gray-500">January 5, 2024</p>
-                        </div>
-                    </div>
-                    <button class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
-                        Read More Articles
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Support Us Section -->
     <section class="py-16 bg-green-600 text-white">
@@ -435,11 +419,8 @@
             </div>
             
             <div class="text-center">
-                <button class="bg-white text-green-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition font-semibold mr-4">
+                <button onclick="makeDonation()" class="bg-white text-green-600 px-6 md:px-8 py-3 rounded-lg hover:bg-gray-100 transition font-semibold mobile-btn">
                     Make a Donation
-                </button>
-                <button class="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-green-600 transition font-semibold">
-                    Get Involved
                 </button>
             </div>
         </div>
@@ -555,11 +536,14 @@
             <!-- Pre-Schools & Primary -->
             <div class="mb-12">
                 <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Pre-Schools & Primary</h3>
+                <div class="bg-yellow-50 rounded-lg p-4 mb-4 border border-yellow-200">
+                    <p class="text-yellow-800 font-semibold text-center">📍 FEES INCLUDES BREAKFAST ONLY</p>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white rounded-lg shadow-lg overflow-hidden">
                         <thead class="bg-green-600 text-white">
                             <tr>
-                                <th class="py-3 px-4 text-left">Grade</th>
+                                <th class="py-3 px-4 text-left">Class</th>
                                 <th class="py-3 px-4 text-center">Term 1</th>
                                 <th class="py-3 px-4 text-center">Term 2</th>
                                 <th class="py-3 px-4 text-center">Term 3</th>
@@ -575,7 +559,7 @@
                                 <td class="py-3 px-4 text-center font-bold">KSh 9,000</td>
                             </tr>
                             <tr class="border-b hover:bg-green-50">
-                                <td class="py-3 px-4 font-semibold">PP1 – PP2</td>
+                                <td class="py-3 px-4 font-semibold">PP1</td>
                                 <td class="py-3 px-4 text-center">KSh 4,500</td>
                                 <td class="py-3 px-4 text-center">KSh 4,000</td>
                                 <td class="py-3 px-4 text-center">KSh 4,000</td>
@@ -595,12 +579,15 @@
 
             <!-- Junior School -->
             <div class="mb-12">
-                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Junior School</h3>
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Junior School (Grade 7-9) - 2026</h3>
+                <div class="bg-blue-50 rounded-lg p-4 mb-4 border border-blue-200">
+                    <p class="text-blue-800 font-semibold text-center">🎯 OUTERING JUNIOR SCHOOL - Knowledge is Precious</p>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white rounded-lg shadow-lg overflow-hidden">
                         <thead class="bg-green-600 text-white">
                             <tr>
-                                <th class="py-3 px-4 text-left">Grade</th>
+                                <th class="py-3 px-4 text-left">Vote Head</th>
                                 <th class="py-3 px-4 text-center">Term 1</th>
                                 <th class="py-3 px-4 text-center">Term 2</th>
                                 <th class="py-3 px-4 text-center">Term 3</th>
@@ -608,26 +595,75 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <tr class="border-b hover:bg-green-50">
+                                <td class="py-3 px-4 font-semibold">Tuition Fees</td>
+                                <td class="py-3 px-4 text-center">KSh 5,500</td>
+                                <td class="py-3 px-4 text-center">KSh 5,000</td>
+                                <td class="py-3 px-4 text-center">KSh 4,900</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 15,400</td>
+                            </tr>
+                            <tr class="border-b hover:bg-green-50">
+                                <td class="py-3 px-4 font-semibold">School ID</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">-</td>
+                                <td class="py-3 px-4 text-center">-</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 500</td>
+                            </tr>
+                            <tr class="border-b hover:bg-green-50">
+                                <td class="py-3 px-4 font-semibold">Activity Fees</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 1,500</td>
+                            </tr>
+                            <tr class="border-b hover:bg-green-50">
+                                <td class="py-3 px-4 font-semibold">Mid Assessment</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">-</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 1,000</td>
+                            </tr>
+                            <tr class="border-b hover:bg-green-50">
+                                <td class="py-3 px-4 font-semibold">End Assessment</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 1,500</td>
+                            </tr>
                             <tr class="hover:bg-green-50">
-                                <td class="py-3 px-4 font-semibold">Grade 7, 8 & 9</td>
-                                <td class="py-3 px-4 text-center">KSh 7,500</td>
-                                <td class="py-3 px-4 text-center">KSh 6,500</td>
-                                <td class="py-3 px-4 text-center">KSh 5,900</td>
-                                <td class="py-3 px-4 text-center font-bold">KSh 19,900</td>
+                                <td class="py-3 px-4 font-bold text-green-800">TOTAL</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 7,500</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 6,500</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 5,900</td>
+                                <td class="py-3 px-4 text-center font-bold text-green-800">KSh 19,900</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                
+                <div class="mt-6 grid md:grid-cols-2 gap-6">
+                    <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                        <h4 class="font-bold text-yellow-800 mb-2">💰 Payment Policy</h4>
+                        <p class="text-yellow-700 text-sm">First payment for each term MUST be 70% of total fees or full amount. Any amount less will not be accepted.</p>
+                    </div>
+                    <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                        <h4 class="font-bold text-red-800 mb-2">⚠️ Important Notice</h4>
+                        <p class="text-red-700 text-sm">Once fees are paid, there will be NO REFUND. No cash or M-Pesa to personal lines.</p>
+                    </div>
                 </div>
             </div>
 
             <!-- Senior School -->
             <div class="mb-12">
-                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Senior School</h3>
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Form 3 & Form 4 (2026)</h3>
+                <div class="bg-red-50 rounded-lg p-4 mb-4 border border-red-200">
+                    <p class="text-red-800 font-semibold text-center">📋 8-4-4 CURRICULUM: A KCSE CENTRE</p>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white rounded-lg shadow-lg overflow-hidden">
                         <thead class="bg-purple-600 text-white">
                             <tr>
-                                <th class="py-3 px-4 text-left">Class</th>
+                                <th class="py-3 px-4 text-left">Vote Head</th>
                                 <th class="py-3 px-4 text-center">Term 1</th>
                                 <th class="py-3 px-4 text-center">Term 2</th>
                                 <th class="py-3 px-4 text-center">Term 3</th>
@@ -636,28 +672,60 @@
                         </thead>
                         <tbody>
                             <tr class="border-b hover:bg-purple-50">
-                                <td class="py-3 px-4 font-semibold">Grade 10</td>
-                                <td class="py-3 px-4 text-center">KSh 9,000</td>
-                                <td class="py-3 px-4 text-center">KSh 7,500</td>
-                                <td class="py-3 px-4 text-center">KSh 6,500</td>
-                                <td class="py-3 px-4 text-center font-bold">KSh 23,000</td>
+                                <td class="py-3 px-4 font-semibold">Tuition Fees</td>
+                                <td class="py-3 px-4 text-center">KSh 6,000</td>
+                                <td class="py-3 px-4 text-center">KSh 6,000</td>
+                                <td class="py-3 px-4 text-center">KSh 5,500</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 17,500</td>
                             </tr>
                             <tr class="border-b hover:bg-purple-50">
-                                <td class="py-3 px-4 font-semibold">Form 3</td>
-                                <td class="py-3 px-4 text-center">KSh 8,000</td>
-                                <td class="py-3 px-4 text-center">KSh 8,000</td>
-                                <td class="py-3 px-4 text-center">KSh 6,500</td>
-                                <td class="py-3 px-4 text-center font-bold">KSh 22,500</td>
+                                <td class="py-3 px-4 font-semibold">School ID</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">-</td>
+                                <td class="py-3 px-4 text-center">-</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 500</td>
+                            </tr>
+                            <tr class="border-b hover:bg-purple-50">
+                                <td class="py-3 px-4 font-semibold">Activity Fees</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 1,500</td>
+                            </tr>
+                            <tr class="border-b hover:bg-purple-50">
+                                <td class="py-3 px-4 font-semibold">Mid Term Assessment</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">-</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 1,000</td>
+                            </tr>
+                            <tr class="border-b hover:bg-purple-50">
+                                <td class="py-3 px-4 font-semibold">End Term Assessment</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center">KSh 500</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 1,500</td>
                             </tr>
                             <tr class="hover:bg-purple-50">
-                                <td class="py-3 px-4 font-semibold">Form 4</td>
-                                <td class="py-3 px-4 text-center">KSh 13,000</td>
-                                <td class="py-3 px-4 text-center">KSh 7,500</td>
-                                <td class="py-3 px-4 text-center">KSh 6,500</td>
-                                <td class="py-3 px-4 text-center font-bold">KSh 27,000</td>
+                                <td class="py-3 px-4 font-bold text-purple-800">TOTAL</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 8,000</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 7,500</td>
+                                <td class="py-3 px-4 text-center font-bold">KSh 6,500</td>
+                                <td class="py-3 px-4 text-center font-bold text-purple-800">KSh 22,000</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                
+                <div class="mt-6 grid md:grid-cols-2 gap-6">
+                    <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                        <h4 class="font-bold text-yellow-800 mb-2">💰 Payment Policy</h4>
+                        <p class="text-yellow-700 text-sm">First payment for each term MUST be 70% of total fees or full amount. Any amount less will not be accepted.</p>
+                    </div>
+                    <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                        <h4 class="font-bold text-red-800 mb-2">⚠️ Important Notice</h4>
+                        <p class="text-red-700 text-sm">Once fees are paid, there will be NO REFUND. No cash or M-Pesa to personal lines.</p>
+                    </div>
                 </div>
             </div>
 
@@ -665,26 +733,41 @@
             <div class="mb-12">
                 <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Additional Fees (All Students)</h3>
                 <div class="bg-orange-50 rounded-xl p-8">
-                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div class="bg-white rounded-lg p-4 shadow-md text-center">
                             <i class="fas fa-user-tie text-green-600 text-2xl mb-3"></i>
                             <h5 class="font-bold text-gray-900 mb-2">Interview</h5>
                             <p class="text-2xl font-bold text-green-600">KSh 300</p>
+                            <p class="text-xs text-gray-500">Once</p>
                         </div>
                         <div class="bg-white rounded-lg p-4 shadow-md text-center">
                             <i class="fas fa-door-open text-green-600 text-2xl mb-3"></i>
                             <h5 class="font-bold text-gray-900 mb-2">Admission</h5>
                             <p class="text-2xl font-bold text-green-600">KSh 1,000</p>
+                            <p class="text-xs text-gray-500">Once</p>
                         </div>
                         <div class="bg-white rounded-lg p-4 shadow-md text-center">
                             <i class="fas fa-utensils text-purple-600 text-2xl mb-3"></i>
-                            <h5 class="font-bold text-gray-900 mb-2">Feeding Program</h5>
+                            <h5 class="font-bold text-gray-900 mb-2">Feeding Programme</h5>
                             <p class="text-lg font-bold text-purple-600">KSh 1,000<br><span class="text-sm font-normal">per month</span></p>
                         </div>
                         <div class="bg-white rounded-lg p-4 shadow-md text-center">
                             <i class="fas fa-graduation-cap text-red-600 text-2xl mb-3"></i>
                             <h5 class="font-bold text-gray-900 mb-2">Form 4 KCSE Logistics</h5>
                             <p class="text-2xl font-bold text-red-600">KSh 5,000</p>
+                            <p class="text-xs text-gray-500">Form 4 only</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 shadow-md text-center">
+                            <i class="fas fa-book text-blue-600 text-2xl mb-3"></i>
+                            <h5 class="font-bold text-gray-900 mb-2">Assessment Book</h5>
+                            <p class="text-lg font-bold text-blue-600">KSh 300</p>
+                            <p class="text-xs text-gray-500">On demand</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 shadow-md text-center">
+                            <i class="fas fa-running text-orange-600 text-2xl mb-3"></i>
+                            <h5 class="font-bold text-gray-900 mb-2">Activity Fee</h5>
+                            <p class="text-lg font-bold text-orange-600">KSh 500</p>
+                            <p class="text-xs text-gray-500">Per term</p>
                         </div>
                     </div>
                 </div>
@@ -1024,16 +1107,7 @@
                 </div>
             </div>
             
-            <div class="text-center mt-12">
-                <button class="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg mr-4">
-                    <i class="fas fa-file-upload mr-2"></i>
-                    Submit Application
-                </button>
-                <button class="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors shadow-lg">
-                    <i class="fas fa-envelope mr-2"></i>
-                    Contact HR
-                </button>
-            </div>
+
         </div>
     </section>
 
@@ -1146,6 +1220,160 @@
     </footer>
 
     <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+        
+        // Button functionality
+        function startApplication() {
+            alert('Application process will begin. Please prepare all required documents listed above.');
+            window.location.href = '#application';
+        }
+        
+        function joinAlumni() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl p-6 md:p-8 max-w-md w-full mx-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Join Our Alumni Network</h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-2xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="text-center mb-6">
+                            <p class="text-gray-600">Follow Outering School on social media and stay connected with our alumni community</p>
+                        </div>
+                        
+                        <a href="https://www.instagram.com/outer_ringschools?igsh=NnpzdGtnZXZwNWk3" target="_blank" class="flex items-center p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition">
+                            <i class="fab fa-instagram text-pink-500 text-2xl mr-4"></i>
+                            <div>
+                                <h3 class="font-bold text-gray-900">Instagram</h3>
+                                <p class="text-sm text-gray-600">@outer_ringschools</p>
+                            </div>
+                        </a>
+                        
+                        <a href="https://www.linkedin.com/in/outering-schools-31474221a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                            <i class="fab fa-linkedin-in text-blue-500 text-2xl mr-4"></i>
+                            <div>
+                                <h3 class="font-bold text-gray-900">LinkedIn</h3>
+                                <p class="text-sm text-gray-600">Outering Schools</p>
+                            </div>
+                        </a>
+                        
+                        <a href="https://x.com/outeringschools" target="_blank" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                            <i class="fab fa-twitter text-blue-500 text-2xl mr-4"></i>
+                            <div>
+                                <h3 class="font-bold text-gray-900">Twitter/X</h3>
+                                <p class="text-sm text-gray-600">@outeringschools</p>
+                            </div>
+                        </a>
+                        
+                        <a href="https://www.youtube.com/@outeringschools4319" target="_blank" class="flex items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition">
+                            <i class="fab fa-youtube text-red-500 text-2xl mr-4"></i>
+                            <div>
+                                <h3 class="font-bold text-gray-900">YouTube</h3>
+                                <p class="text-sm text-gray-600">@outeringschools4319</p>
+                            </div>
+                        </a>
+                        
+                        <div class="flex items-center p-4 bg-green-50 rounded-lg">
+                            <i class="fab fa-whatsapp text-green-500 text-2xl mr-4"></i>
+                            <div>
+                                <h3 class="font-bold text-gray-900">WhatsApp</h3>
+                                <p class="text-sm text-gray-600">+254 722 225 019</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center p-4 bg-purple-50 rounded-lg">
+                            <i class="fas fa-envelope text-purple-500 text-2xl mr-4"></i>
+                            <div>
+                                <h3 class="font-bold text-gray-900">Email</h3>
+                                <p class="text-sm text-gray-600">info@outeringschool.ac.ke</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <button onclick="this.closest('.fixed').remove()" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition font-medium">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function viewPrograms() {
+            alert('Detailed program information will be available soon. Contact our office for current program details.');
+        }
+        
+        function readArticles() {
+            alert('Educational blog articles will be available soon. Stay tuned for updates!');
+        }
+        
+        function makeDonation() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl p-6 md:p-8 max-w-md w-full mx-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Make a Donation</h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-2xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="text-center mb-6">
+                        <p class="text-gray-600 mb-4">Thank you for supporting our mission! Use the M-Pesa details below to make your donation.</p>
+                    </div>
+                    
+                    <div class="bg-green-50 rounded-lg p-6 border border-green-200">
+                        <h3 class="text-lg font-bold text-green-800 mb-4 text-center">📱 M-PESA Donation Details</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-gray-700">Paybill:</span>
+                                <span class="text-lg font-bold text-green-600">400200</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-gray-700">Account:</span>
+                                <span class="text-lg font-bold text-green-600">40047314</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <p class="text-blue-800 text-sm text-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Your donation helps us provide quality education and support our students' future.
+                        </p>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <button onclick="this.closest('.fixed').remove()" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition font-medium">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function getInvolved() {
+            alert('Volunteer opportunities available! Contact us at 0722225019 to learn how you can help.');
+        }
+        
+        function submitJobApplication() {
+            alert('Job application portal will be available soon. Please email your CV to our HR department.');
+        }
+        
+        function contactHR() {
+            alert('HR Contact: Please call 0722225019 or visit our office for employment inquiries.');
+        }
+        
         // Load news from backend
         async function loadNews() {
             // Get articles from admin panel (localStorage)
@@ -1229,10 +1457,16 @@
                     fees: [
                         { grade: 'Grade 7, 8 & 9', term1: 7500, term2: 6500, term3: 5900, total: 19900 }
                     ],
-                    requirements: ['Report form from previous school', 'Birth certificate', 'Parent ID copy', 'UPI number', 'Medical report (if applicable)'],
+                    requirements: ['Report form from previous school', 'Assessment Number/KPSEA slip', 'Birth certificate', 'Parent ID copy', 'UPI number', 'Medical report (if applicable)'],
                     uniform: {
-                        boys: 'Khaki trousers\nWhite short-sleeved shirt\nBrown tie\nBrown sweater\nBlack shoes\nBrown socks',
-                        girls: 'Khaki skirt\nWhite short-sleeved blouse\nBrown tie\nBrown sweater\nBlack shoes\nBrown socks'
+                        boys: 'Charcoal grey trousers\nWhite short-sleeved shirt with school badge\nPlain green tie\nJungle green sweater with white stripes on sleeves and neck\nGreen blazer with yellow stripes (optional)\nBlack leather shoes\nGrey socks with blue and white stripes\nGreen/white tracksuit (KSh 1,500)',
+                        girls: 'Charcoal grey skirt with box pleat in front (not mini)\nWhite short-sleeved blouse with school badge\nPlain green tie\nGreen sweater (same as boys)\nGreen blazer (same as boys)\nBlack leather shoes\nWhite socks with green and white stripes\nGreen/white tracksuit (KSh 1,500)'
+                    },
+                    textbooks: {
+                        grade7: 'English: Strange happenings, Kiswahili: Mshale wa matumaini, Mathematics: Oxford/Longhorn, Social Studies: Spotlight/Longhorn, Integrated Science: Oxford',
+                        grade8: 'English: Bridges without Rivers and other stories, Kiswahili: Wema Hauozi (Tamthilia)',
+                        grade9: 'English: Last laugh, Kiswahili: Hodi hodi mashairi',
+                        general: 'Poetry: Daughters of Nature (approved for Grade 7-9)'
                     }
                 },
                 senior: {
@@ -1249,10 +1483,13 @@
                 form: {
                     title: 'Form 3 & Form 4',
                     fees: [
-                        { grade: 'Form 3', term1: 8000, term2: 8000, term3: 6500, total: 22500 },
-                        { grade: 'Form 4', term1: 13000, term2: 7500, term3: 6500, total: 27000 }
+                        { grade: 'Form 3 & 4', term1: 8000, term2: 7500, term3: 6500, total: 22000 }
                     ],
-                    requirements: ['KCPE certificate', 'Report form from previous school', 'Birth certificate', 'Parent ID copy', 'UPI number', 'Form 4 KCSE Logistics: KSh 5,000']
+                    requirements: ['KCPE certificate', 'Report form from previous school', 'Birth certificate', 'Parent ID copy', 'UPI number', 'Form 4 KCSE Logistics: KSh 5,000'],
+                    uniform: {
+                        boys: 'Charcoal grey trousers\nWhite short-sleeved shirt with school badge\nPlain green tie\nJungle green sweater with white stripes on sleeves\nGreen blazer with yellow stripes (optional)\nBlack leather shoes\nGrey socks with blue and white stripes\nGreen/white tracksuit (KSh 1,500)',
+                        girls: 'Charcoal grey skirt with box pleat in front (not mini)\nWhite short-sleeved blouse with school badge\nPlain green tie\nGreen sweater (same as boys)\nGreen blazer (same as boys)\nBlack leather shoes\nWhite socks with green and white stripes\nGreen/white tracksuit (KSh 1,500)'
+                    }
                 }
             };
             
