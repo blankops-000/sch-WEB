@@ -3,44 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Testament School - Admin Panel</title>
-    
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>Outering School - Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --primary: #1e40af;
-            --secondary: #3b82f6;
-            --accent: #60a5fa;
+        .sidebar-item:hover {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transform: translateX(4px);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .gradient-bg {
-            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .notification {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
         }
     </style>
 </head>
 <body>
     <div id="root"></div>
     
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { createRoot } = ReactDOM;
-
-        const Router = ({ children }) => {
-            const [currentHash, setCurrentHash] = useState(window.location.hash || '#/');
-            
-            useEffect(() => {
-                const handleHashChange = () => setCurrentHash(window.location.hash || '#/');
-                window.addEventListener('hashchange', handleHashChange);
-                return () => window.removeEventListener('hashchange', handleHashChange);
-            }, []);
-            
-            return children(currentHash);
-        };
-
+    <script>
+        // State management
+        let currentUser = null;
+        let activeSection = 'dashboard';
+        let academicsTab = 'handbooks';
+        let selectedGrade = 'PP1';
+        let showNewsForm = false;
+        let showStaffForm = false;
+        let showPolicyForm = false;
+        let notifications = [];
+        
+        // Data storage with enhanced structure
+        let articles = [
+            {id: 1, title: 'Students Win Science Competition', status: 'Published', date: '2024-01-15', views: 245, category: 'Achievement'},
+            {id: 2, title: 'New Library Opening Ceremony', status: 'Draft', date: '2024-01-20', views: 0, category: 'Event'}
+        ];
+        let events = [
+            {id: 1, title: 'Mid-Term Exams', date: '2024-02-19', category: 'Academic', status: 'Upcoming'},
+            {id: 2, title: 'Sports Day', date: '2024-03-15', category: 'Sports', status: 'Planning'}
+        ];
+        
+        // Load existing data from localStorage
+        const savedArticles = localStorage.getItem('admin_articles');
+        if (savedArticles) {
+            articles = JSON.parse(savedArticles);
+        }
+        
+        const savedEvents = localStorage.getItem('admin_events');
+        if (savedEvents) {
+            events = JSON.parse(savedEvents);
+        }
+        let staff = [
+            {id: 1, name: 'Dr. Sarah Johnson', position: 'Principal', email: 's.johnson@school.edu', department: 'Administration', status: 'Active'},
+            {id: 2, name: 'Mr. James Wilson', position: 'Math Teacher', email: 'j.wilson@school.edu', department: 'Mathematics', status: 'Active'}
+        ];
+        let policies = [
+            {id: 1, title: 'Academic Integrity Policy', category: 'Academic', status: 'Active', lastUpdated: '2024-01-10'},
+            {id: 2, title: 'Student Code of Conduct', category: 'Student', status: 'Under Review', lastUpdated: '2024-01-05'}
+        ];
+        let contacts = [
+            {id: 1, name: 'John Smith', email: 'john@example.com', subject: 'Admission Inquiry', status: 'New', date: '2024-01-15', priority: 'High'},
+            {id: 2, name: 'Mary Johnson', email: 'mary@example.com', subject: 'Fee Payment Query', status: 'Replied', date: '2024-01-14', priority: 'Medium'}
+        ];
+        
+        const grades = ['PP1', 'PP2', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9'];
+        
+        // Utility functions
+        function showNotification(message, type = 'success') {
+            const notification = {
+                id: Date.now(),
+                message,
+                type,
+                timestamp: new Date()
+            };
+            notifications.unshift(notification);
+            setTimeout(() => {
+                notifications = notifications.filter(n => n.id !== notification.id);
+                render();
+            }, 5000);
+            render();
+        }
+        
+        // Authentication
         const checkAuth = () => {
             const storedUser = localStorage.getItem('admin_user');
             if (storedUser) {
@@ -53,10 +118,11 @@
             return null;
         };
         
-        const loginUser = async (username, password) => {
+        const loginUser = (username, password) => {
             if (username.toLowerCase().trim() === 'admin' && password.trim() === 'outering2024') {
-                const userData = { id: 1, name: 'Administrator', username, role: 'admin' };
+                const userData = { id: 1, name: 'Administrator', username, role: 'admin', loginTime: new Date() };
                 localStorage.setItem('admin_user', JSON.stringify(userData));
+                showNotification('Welcome back, Administrator!');
                 return { success: true, user: userData };
             }
             return { success: false, message: 'Invalid credentials' };
@@ -64,713 +130,775 @@
         
         const logoutUser = () => {
             localStorage.removeItem('admin_user');
-            window.location.hash = '#/';
+            currentUser = null;
+            showNotification('Logged out successfully');
+            render();
         };
 
-        const AdminLogin = () => {
-            const [credentials, setCredentials] = useState({ username: '', password: '' });
-            const [loading, setLoading] = useState(false);
-            const [error, setError] = useState('');
+        // Event handlers
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('error-message');
             
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                setError('');
-                setLoading(true);
-                
-                const result = await loginUser(credentials.username, credentials.password);
-                
-                if (result.success) {
-                    window.location.hash = '#/admin';
-                } else {
-                    setError(result.message || 'Invalid credentials');
-                }
-                
-                setLoading(false);
+            const result = loginUser(username, password);
+            
+            if (result.success) {
+                currentUser = result.user;
+                render();
+            } else {
+                errorDiv.textContent = result.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function setActiveSection(section) {
+            activeSection = section;
+            render();
+        }
+
+        function setAcademicsTab(tab) {
+            academicsTab = tab;
+            render();
+        }
+
+        function setSelectedGrade(grade) {
+            selectedGrade = grade;
+            render();
+        }
+
+        function toggleNewsForm() {
+            showNewsForm = !showNewsForm;
+            render();
+        }
+
+        function toggleStaffForm() {
+            showStaffForm = !showStaffForm;
+            render();
+        }
+
+        function togglePolicyForm() {
+            showPolicyForm = !showPolicyForm;
+            render();
+        }
+
+        function handleNewsSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const newArticle = {
+                id: Date.now(),
+                title: formData.get('title'),
+                content: formData.get('content'),
+                category: formData.get('category'),
+                date: new Date().toISOString().split('T')[0],
+                status: 'Published',
+                views: 0
             };
+            articles.unshift(newArticle);
             
-            return (
-                <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-900 to-blue-700">
-                    <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl">
-                        <div className="text-center mb-8">
-                            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i className="fas fa-lock text-white text-2xl"></i>
+            // Save to localStorage for home page
+            localStorage.setItem('admin_articles', JSON.stringify(articles));
+            
+            showNewsForm = false;
+            showNotification('Article published successfully!');
+            render();
+        }
+
+        function handleEventSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const newEvent = {
+                id: Date.now(),
+                title: formData.get('title'),
+                date: formData.get('date'),
+                category: formData.get('category'),
+                status: 'Upcoming'
+            };
+            events.push(newEvent);
+            
+            // Save to localStorage for home page
+            localStorage.setItem('admin_events', JSON.stringify(events));
+            
+            event.target.reset();
+            showNotification('Event created successfully!');
+            render();
+        }
+
+        function handleStaffSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const newStaff = {
+                id: Date.now(),
+                name: formData.get('name'),
+                position: formData.get('position'),
+                email: formData.get('email'),
+                department: formData.get('department'),
+                status: 'Active'
+            };
+            staff.push(newStaff);
+            showStaffForm = false;
+            showNotification('Staff member added successfully!');
+            render();
+        }
+
+        function handlePolicySubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const newPolicy = {
+                id: Date.now(),
+                title: formData.get('title'),
+                category: formData.get('category'),
+                content: formData.get('content'),
+                status: 'Active',
+                lastUpdated: new Date().toISOString().split('T')[0]
+            };
+            policies.push(newPolicy);
+            showPolicyForm = false;
+            showNotification('Policy added successfully!');
+            render();
+        }
+
+        function deleteItem(type, id) {
+            switch(type) {
+                case 'article':
+                    articles = articles.filter(a => a.id !== id);
+                    showNotification('Article deleted');
+                    break;
+                case 'event':
+                    events = events.filter(e => e.id !== id);
+                    showNotification('Event deleted');
+                    break;
+                case 'staff':
+                    staff = staff.filter(s => s.id !== id);
+                    showNotification('Staff member removed');
+                    break;
+                case 'policy':
+                    policies = policies.filter(p => p.id !== id);
+                    showNotification('Policy deleted');
+                    break;
+            }
+            render();
+        }
+
+        function updateContactStatus(id, status) {
+            const contact = contacts.find(c => c.id === id);
+            if (contact) {
+                contact.status = status;
+                showNotification(`Contact marked as ${status.toLowerCase()}`);
+                render();
+            }
+        }
+
+        // Component renderers
+        function renderNotifications() {
+            if (notifications.length === 0) return '';
+            
+            return `
+                <div class="fixed top-4 right-4 z-50 space-y-2">
+                    ${notifications.map(notif => `
+                        <div class="notification bg-white border-l-4 ${notif.type === 'success' ? 'border-green-500' : 'border-red-500'} rounded-lg shadow-lg p-4 max-w-sm">
+                            <div class="flex items-center">
+                                <i class="fas ${notif.type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500'} mr-3"></i>
+                                <p class="text-sm font-medium text-gray-900">${notif.message}</p>
                             </div>
-                            <h2 className="text-3xl font-bold text-gray-900">Admin Login</h2>
-                            <p className="text-gray-600 mt-2">The Testament School Administration</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderLogin() {
+            return `
+                <div class="min-h-screen flex items-center justify-center gradient-bg">
+                    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl animate-fade-in">
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-graduation-cap text-white text-3xl"></i>
+                            </div>
+                            <h2 class="text-3xl font-bold text-gray-900">Admin Portal</h2>
+                            <p class="text-gray-600 mt-2">Outering School Management System</p>
                         </div>
                         
-                        {error && (
-                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                                {error}
-                            </div>
-                        )}
+                        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
                         
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-4">
-                                <label className="block text-gray-700 mb-2">Username</label>
-                                <input
-                                    type="text"
-                                    value={credentials.username}
-                                    onChange={(e) => setCredentials({...credentials, username: e.target.value})}
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border focus:border-blue-500 focus:outline-none"
-                                    placeholder="Enter username"
-                                />
-                            </div>
-                            
-                            <div className="mb-6">
-                                <label className="block text-gray-700 mb-2">Password</label>
-                                <input
-                                    type="password"
-                                    value={credentials.password}
-                                    onChange={(e) => setCredentials({...credentials, password: e.target.value})}
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border focus:border-blue-500 focus:outline-none"
-                                    placeholder="Enter password"
-                                />
-                            </div>
-                            
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition disabled:opacity-50"
-                            >
-                                {loading ? 'Logging in...' : 'Login to Admin Panel'}
-                            </button>
-                            
-                            <div className="mt-6 text-center">
-                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
-                                    <p className="font-medium text-yellow-800 mb-1">Demo Mode:</p>
-                                    <p className="text-yellow-700 text-xs">Username: admin | Password: outering2024</p>
-                                </div>
-                            </div>
-                            
-                            <div className="mt-8 text-center">
-                                <button 
-                                    type="button"
-                                    onClick={() => window.location.href = 'home.html'}
-                                    className="text-blue-600 hover:text-blue-800 bg-transparent border-none"
-                                >
-                                    ← Back to Website
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            );
-        };
-
-        const AdminDashboard = () => {
-            const [user] = useState(checkAuth());
-            const [activeSection, setActiveSection] = useState('dashboard');
-            
-            const stats = [
-                { label: 'Total Students', value: '956', icon: 'users', color: 'blue' },
-                { label: 'Total Staff', value: '68', icon: 'chalkboard-teacher', color: 'green' },
-                { label: 'Active Events', value: '12', icon: 'calendar-alt', color: 'purple' },
-                { label: 'New Messages', value: '8', icon: 'envelope', color: 'yellow' }
-            ];
-            
-            const menuItems = [
-                { id: 'dashboard', label: 'Dashboard', icon: 'tachometer-alt' },
-                { id: 'academics', label: 'Academics', icon: 'graduation-cap' },
-                { id: 'news', label: 'News', icon: 'newspaper' },
-                { id: 'calendar', label: 'Calendar', icon: 'calendar-alt' },
-                { id: 'staff', label: 'Staff', icon: 'users' },
-                { id: 'policies', label: 'Policies', icon: 'file-alt' },
-                { id: 'contacts', label: 'Contacts', icon: 'envelope' }
-            ];
-            
-            const renderContent = () => {
-                switch(activeSection) {
-                    case 'academics':
-                        return <AcademicsManager />;
-                    case 'news':
-                        return <NewsManager />;
-                    case 'calendar':
-                        return <CalendarManager />;
-                    case 'staff':
-                        return <StaffManager />;
-                    case 'policies':
-                        return <PoliciesManager />;
-                    case 'contacts':
-                        return <ContactsManager />;
-                    default:
-                        const [recentActivities, setRecentActivities] = useState([
-                            {id: 1, action: 'New student enrolled', user: 'John Doe - Grade 5', time: '2 minutes ago', type: 'student', icon: 'user-plus'},
-                            {id: 2, action: 'Article published', user: 'Science Fair Results', time: '15 minutes ago', type: 'news', icon: 'newspaper'},
-                            {id: 3, action: 'Event scheduled', user: 'Parent-Teacher Meeting', time: '1 hour ago', type: 'calendar', icon: 'calendar-plus'},
-                            {id: 4, action: 'Staff updated', user: 'Sarah Johnson - Principal', time: '2 hours ago', type: 'staff', icon: 'user-edit'},
-                            {id: 5, action: 'Policy created', user: 'Academic Integrity Guidelines', time: '3 hours ago', type: 'policy', icon: 'file-alt'}
-                        ]);
-                        const quickActions = [
-                            {title: 'Add Student', desc: 'Enroll new student', icon: 'user-plus', color: 'blue', action: () => setActiveSection('academics')},
-                            {title: 'Create Event', desc: 'Schedule new event', icon: 'calendar-plus', color: 'green', action: () => setActiveSection('calendar')},
-                            {title: 'Publish News', desc: 'Write article', icon: 'newspaper', color: 'purple', action: () => setActiveSection('news')},
-                            {title: 'Add Staff', desc: 'New staff member', icon: 'user-tie', color: 'orange', action: () => setActiveSection('staff')},
-                            {title: 'View Reports', desc: 'Academic reports', icon: 'chart-bar', color: 'red', action: () => setActiveSection('academics')},
-                            {title: 'Manage Contacts', desc: 'Reply to messages', icon: 'envelope', color: 'teal', action: () => setActiveSection('contacts')}
-                        ];
-                        const clearActivity = (id) => setRecentActivities(recentActivities.filter(a => a.id !== id));
-                        return (
+                        <form onsubmit="handleLogin(event)" class="space-y-6">
                             <div>
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-2xl font-bold text-gray-900">Dashboard Overview</h2>
-                                    <div className="text-sm text-gray-500">Last updated: {new Date().toLocaleTimeString()}</div>
-                                </div>
-                                
-                                {/* Stats Cards */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                                    {stats.map((stat, index) => (
-                                        <div key={index} className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow">
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <p className="text-sm text-gray-500">{stat.label}</p>
-                                                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                                                    <div className="flex items-center mt-2">
-                                                        <span className="text-xs text-green-600 font-medium">↗ +5.2%</span>
-                                                        <span className="text-xs text-gray-500 ml-1">vs last month</span>
-                                                    </div>
-                                                </div>
-                                                <div className={`p-3 rounded-lg ${
-                                                    stat.color === 'blue' ? 'bg-blue-100' :
-                                                    stat.color === 'green' ? 'bg-green-100' :
-                                                    stat.color === 'purple' ? 'bg-purple-100' : 'bg-yellow-100'
-                                                }`}>
-                                                    <i className={`fas fa-${stat.icon} text-2xl ${
-                                                        stat.color === 'blue' ? 'text-blue-600' :
-                                                        stat.color === 'green' ? 'text-green-600' :
-                                                        stat.color === 'purple' ? 'text-purple-600' : 'text-yellow-600'
-                                                    }`}></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Quick Actions & Recent Activities */}
-                                <div className="grid lg:grid-cols-3 gap-8">
-                                    {/* Quick Actions */}
-                                    <div className="lg:col-span-2">
-                                        <div className="bg-white rounded-xl shadow p-6">
-                                            <h3 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h3>
-                                            <div className="grid md:grid-cols-3 gap-4">
-                                                {quickActions.map((action, index) => (
-                                                    <button key={index} onClick={action.action} className="p-4 border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all group">
-                                                        <div className={`w-12 h-12 rounded-lg mb-3 flex items-center justify-center ${
-                                                            action.color === 'blue' ? 'bg-blue-100 group-hover:bg-blue-200' :
-                                                            action.color === 'green' ? 'bg-green-100 group-hover:bg-green-200' :
-                                                            action.color === 'purple' ? 'bg-purple-100 group-hover:bg-purple-200' :
-                                                            action.color === 'orange' ? 'bg-orange-100 group-hover:bg-orange-200' :
-                                                            action.color === 'red' ? 'bg-red-100 group-hover:bg-red-200' :
-                                                            'bg-teal-100 group-hover:bg-teal-200'
-                                                        }`}>
-                                                            <i className={`fas fa-${action.icon} text-lg ${
-                                                                action.color === 'blue' ? 'text-blue-600' :
-                                                                action.color === 'green' ? 'text-green-600' :
-                                                                action.color === 'purple' ? 'text-purple-600' :
-                                                                action.color === 'orange' ? 'text-orange-600' :
-                                                                action.color === 'red' ? 'text-red-600' :
-                                                                'text-teal-600'
-                                                            }`}></i>
-                                                        </div>
-                                                        <h4 className="font-semibold text-gray-900 mb-1">{action.title}</h4>
-                                                        <p className="text-sm text-gray-500">{action.desc}</p>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Recent Activities */}
-                                    <div className="lg:col-span-1">
-                                        <div className="bg-white rounded-xl shadow p-6">
-                                            <div className="flex justify-between items-center mb-6">
-                                                <h3 className="text-xl font-bold text-gray-900">Recent Activities</h3>
-                                                <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</button>
-                                            </div>
-                                            <div className="space-y-4 max-h-96 overflow-y-auto">
-                                                {recentActivities.map((activity) => (
-                                                    <div key={activity.id} className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg group">
-                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                                            activity.type === 'student' ? 'bg-blue-100' :
-                                                            activity.type === 'news' ? 'bg-purple-100' :
-                                                            activity.type === 'calendar' ? 'bg-green-100' :
-                                                            activity.type === 'staff' ? 'bg-orange-100' :
-                                                            'bg-gray-100'
-                                                        }`}>
-                                                            <i className={`fas fa-${activity.icon} text-xs ${
-                                                                activity.type === 'student' ? 'text-blue-600' :
-                                                                activity.type === 'news' ? 'text-purple-600' :
-                                                                activity.type === 'calendar' ? 'text-green-600' :
-                                                                activity.type === 'staff' ? 'text-orange-600' :
-                                                                'text-gray-600'
-                                                            }`}></i>
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                                                            <p className="text-sm text-gray-600 truncate">{activity.user}</p>
-                                                            <p className="text-xs text-gray-400">{activity.time}</p>
-                                                        </div>
-                                                        <button onClick={() => clearActivity(activity.id)} className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 transition-all">
-                                                            <i className="fas fa-times text-xs"></i>
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* System Status */}
-                                <div className="mt-8 grid md:grid-cols-3 gap-6">
-                                    <div className="bg-white rounded-xl shadow p-6">
-                                        <h4 className="font-bold text-gray-900 mb-4">System Status</h4>
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-sm text-gray-600">Server Status</span>
-                                                <span className="flex items-center text-green-600"><div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>Online</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-sm text-gray-600">Database</span>
-                                                <span className="flex items-center text-green-600"><div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>Connected</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-sm text-gray-600">Backup</span>
-                                                <span className="flex items-center text-blue-600"><div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>Last: 2h ago</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white rounded-xl shadow p-6">
-                                        <h4 className="font-bold text-gray-900 mb-4">Upcoming Events</h4>
-                                        <div className="space-y-2">
-                                            <div className="text-sm"><span className="font-medium">Parent Meeting</span><div className="text-gray-500">Tomorrow, 9:00 AM</div></div>
-                                            <div className="text-sm"><span className="font-medium">Sports Day</span><div className="text-gray-500">Friday, 8:00 AM</div></div>
-                                            <div className="text-sm"><span className="font-medium">Term Exams</span><div className="text-gray-500">Next Week</div></div>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white rounded-xl shadow p-6">
-                                        <h4 className="font-bold text-gray-900 mb-4">Pending Tasks</h4>
-                                        <div className="space-y-2">
-                                            <div className="flex items-center text-sm"><input type="checkbox" className="mr-2" />Review Grade 9 Reports</div>
-                                            <div className="flex items-center text-sm"><input type="checkbox" className="mr-2" />Update Staff Records</div>
-                                            <div className="flex items-center text-sm"><input type="checkbox" className="mr-2" />Approve News Articles</div>
-                                        </div>
-                                    </div>
+                                <label class="block text-gray-700 font-medium mb-2">Username</label>
+                                <div class="relative">
+                                    <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" id="username" required class="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition" placeholder="Enter username">
                                 </div>
                             </div>
-                        );
-                }
-            };
-            
-            return (
-                <div className="min-h-screen bg-gray-100 flex">
-                    <div className="w-64 bg-white shadow-lg flex flex-col">
-                        <div className="p-6 border-b">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                                    <i className="fas fa-user-shield text-white"></i>
-                                </div>
-                                <div>
-                                    <h1 className="text-lg font-bold">Admin Panel</h1>
-                                    <p className="text-sm text-gray-600">{user?.name}</p>
+                            
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Password</label>
+                                <div class="relative">
+                                    <i class="fas fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="password" id="password" required class="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition" placeholder="Enter password">
                                 </div>
                             </div>
-                        </div>
-                        
-                        <nav className="p-4 flex-1">
-                            {menuItems.map(item => (
-                                <button
-                                    key={item.id}
-                                    onClick={() => setActiveSection(item.id)}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center space-x-3 transition ${
-                                        activeSection === item.id 
-                                            ? 'bg-blue-100 text-blue-700 font-medium' 
-                                            : 'text-gray-600 hover:bg-gray-100'
-                                    }`}
-                                >
-                                    <i className={`fas fa-${item.icon}`}></i>
-                                    <span>{item.label}</span>
-                                </button>
-                            ))}
-                        </nav>
-                        
-                        <div className="mt-auto p-4 border-t border-gray-200">
-                            <button 
-                                onClick={() => window.location.href = 'home.html'}
-                                className="w-full px-4 py-2 text-gray-600 hover:text-gray-800 mb-2 border border-gray-300 rounded-lg"
-                            >
-                                <i className="fas fa-home mr-2"></i>View Website
+                            
+                            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition transform hover:scale-105">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Access Admin Panel
                             </button>
-                            <button 
-                                onClick={logoutUser}
-                                className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-                            >
-                                <i className="fas fa-sign-out-alt mr-2"></i>Logout
+                        </form>
+                        
+                        <div class="mt-8 text-center">
+                            <button type="button" onclick="window.location.href = 'home.html'" class="text-blue-600 hover:text-blue-800 font-medium">
+                                <i class="fas fa-arrow-left mr-2"></i>Back to Website
                             </button>
                         </div>
-                    </div>
-                    
-                    <div className="flex-1 p-8">
-                        {renderContent()}
                     </div>
                 </div>
-            );
-        };
+                ${renderNotifications()}
+            `;
+        }
 
-        const AcademicsManager = () => {
-            const [activeTab, setActiveTab] = useState('handbooks');
-            const [selectedGrade, setSelectedGrade] = useState('PP1');
-            const grades = ['PP1', 'PP2', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9'];
+        function renderDashboard() {
+            const totalStudents = 956;
+            const totalRevenue = 45000000; // KSh
+            const attendanceRate = 94.5;
             
-            return (
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Academics Management</h2>
-                    <div className="flex space-x-4 mb-6">
-                        {['handbooks', 'fees', 'uniform', 'requirements'].map(tab => (
-                            <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-2 rounded ${activeTab === tab ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>{tab.charAt(0).toUpperCase() + tab.slice(1)}</button>
-                        ))}
+            return `
+                <div class="animate-fade-in">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-900">Dashboard Overview</h2>
+                            <p class="text-gray-600">Welcome back, ${currentUser?.name}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-500">Last login</p>
+                            <p class="font-medium">${new Date().toLocaleDateString()}</p>
+                        </div>
                     </div>
                     
-                    {activeTab === 'handbooks' && (
-                        <div className="bg-white rounded-xl shadow p-6">
-                            <h3 className="text-lg font-bold mb-4">Student Handbooks</h3>
-                            <div className="grid grid-cols-3 gap-2 mb-4">
-                                {grades.map((grade) => (
-                                    <button key={grade} onClick={() => setSelectedGrade(grade)} className={`p-2 rounded ${selectedGrade === grade ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}>{grade}</button>
-                                ))}
-                            </div>
-                            <div className="border-2 border-dashed border-blue-300 rounded p-8 text-center">
-                                <i className="fas fa-cloud-upload-alt text-3xl text-blue-600 mb-4"></i>
-                                <h4 className="font-bold mb-2">Upload {selectedGrade} Handbook</h4>
-                                <input type="file" accept=".pdf" className="hidden" id="handbook-upload" />
-                                <label htmlFor="handbook-upload" className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer">Choose File</label>
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white card-hover transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-blue-100">Total Students</p>
+                                    <p class="text-3xl font-bold">${totalStudents.toLocaleString()}</p>
+                                    <p class="text-sm text-blue-100 mt-1">+12 this month</p>
+                                </div>
+                                <div class="p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-users text-2xl"></i>
+                                </div>
                             </div>
                         </div>
-                    )}
-                    
-                    {activeTab === 'fees' && (
-                        <div className="space-y-6">
-                            <div className="bg-white rounded-xl shadow p-6">
-                                <h3 className="text-lg font-bold mb-4">2026 Pre & Primary School Fees Structure</h3>
-                                <p className="text-sm text-gray-600 mb-4">Fees Include: Breakfast Only</p>
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full border">
-                                        <thead><tr className="bg-gray-50"><th className="border px-4 py-2 text-left">Class</th><th className="border px-4 py-2">Term 1</th><th className="border px-4 py-2">Term 2</th><th className="border px-4 py-2">Term 3</th><th className="border px-4 py-2">Total</th></tr></thead>
-                                        <tbody>
-                                            <tr><td className="border px-4 py-2 font-medium">Play Group</td><td className="border px-4 py-2 text-center">Ksh 3,000</td><td className="border px-4 py-2 text-center">Ksh 3,000</td><td className="border px-4 py-2 text-center">Ksh 3,000</td><td className="border px-4 py-2 text-center font-bold">Ksh 9,000</td></tr>
-                                            <tr><td className="border px-4 py-2 font-medium">PP1</td><td className="border px-4 py-2 text-center">Ksh 4,500</td><td className="border px-4 py-2 text-center">Ksh 4,000</td><td className="border px-4 py-2 text-center">Ksh 4,000</td><td className="border px-4 py-2 text-center font-bold">Ksh 12,500</td></tr>
-                                            <tr><td className="border px-4 py-2 font-medium">Grade 1-6</td><td className="border px-4 py-2 text-center">Ksh 5,500</td><td className="border px-4 py-2 text-center">Ksh 5,000</td><td className="border px-4 py-2 text-center">Ksh 4,500</td><td className="border px-4 py-2 text-center font-bold">Ksh 15,000</td></tr>
-                                        </tbody>
-                                    </table>
+                        
+                        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white card-hover transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-green-100">Total Staff</p>
+                                    <p class="text-3xl font-bold">${staff.length}</p>
+                                    <p class="text-sm text-green-100 mt-1">All departments</p>
+                                </div>
+                                <div class="p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-chalkboard-teacher text-2xl"></i>
                                 </div>
                             </div>
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="bg-white rounded-xl shadow p-6">
-                                    <h4 className="font-bold mb-4">Other Charges</h4>
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between"><span>Interview</span><span>Ksh 300 (Once)</span></div>
-                                        <div className="flex justify-between"><span>Admission</span><span>Ksh 1,000 (Once)</span></div>
-                                        <div className="flex justify-between"><span>Assessment Book</span><span>Ksh 300 (On demand)</span></div>
-                                        <div className="flex justify-between"><span>Lunch</span><span>Ksh 1,000 (Per month)</span></div>
-                                        <div className="flex justify-between"><span>Activity Fee</span><span>Ksh 500 (Per term)</span></div>
-                                        <div className="flex justify-between"><span>Academic Trips</span><span>Varies</span></div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white card-hover transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-purple-100">Revenue (KSh)</p>
+                                    <p class="text-3xl font-bold">${(totalRevenue/1000000).toFixed(1)}M</p>
+                                    <p class="text-sm text-purple-100 mt-1">This academic year</p>
+                                </div>
+                                <div class="p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-chart-line text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white card-hover transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-orange-100">Attendance</p>
+                                    <p class="text-3xl font-bold">${attendanceRate}%</p>
+                                    <p class="text-sm text-orange-100 mt-1">This week</p>
+                                </div>
+                                <div class="p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-calendar-check text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="setActiveSection('news')" class="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                                        <i class="fas fa-newspaper text-purple-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Publish News</h4>
+                                        <p class="text-sm text-gray-500">Create new article</p>
                                     </div>
                                 </div>
-                                <div className="bg-white rounded-xl shadow p-6">
-                                    <h4 className="font-bold mb-4">Payment Information</h4>
-                                    <div className="space-y-2 text-sm">
-                                        <p><strong>Paybill:</strong> 400200</p>
-                                        <p><strong>Account:</strong> 01109179517600</p>
-                                        <p><strong>Bank:</strong> Co-operative Bank, Kariobangi Branch</p>
-                                        <div className="mt-4 p-3 bg-blue-50 rounded">
-                                            <p className="text-blue-800 font-medium">Digital Learning Available</p>
-                                            <p className="text-blue-600 text-xs">Tablets & online exchange with Poland</p>
+                            </button>
+                            
+                            <button onclick="setActiveSection('calendar')" class="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all text-left">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                                        <i class="fas fa-calendar-plus text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Schedule Event</h4>
+                                        <p class="text-sm text-gray-500">Add to calendar</p>
+                                    </div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="setActiveSection('staff')" class="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition-all text-left">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                                        <i class="fas fa-user-tie text-orange-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Add Staff</h4>
+                                        <p class="text-sm text-gray-500">New team member</p>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">Recent Articles</h3>
+                            <div class="space-y-3">
+                                ${articles.slice(0, 3).map(article => `
+                                    <div class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">${article.title}</h4>
+                                            <p class="text-sm text-gray-500">${article.date} • ${article.views} views</p>
                                         </div>
+                                        <span class="px-2 py-1 text-xs rounded-full ${article.status === 'Published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${article.status}</span>
                                     </div>
-                                </div>
+                                `).join('')}
                             </div>
                         </div>
-                    )}
+                        
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">Upcoming Events</h3>
+                            <div class="space-y-3">
+                                ${events.slice(0, 3).map(event => `
+                                    <div class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">${event.title}</h4>
+                                            <p class="text-sm text-gray-500">${event.date} • ${event.category}</p>
+                                        </div>
+                                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">${event.status}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        function renderAcademics() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Academics Management</h2>
+                    <div class="flex space-x-4 mb-6">
+                        ${['handbooks', 'fees', 'uniform', 'requirements'].map(tab => 
+                            `<button onclick="setAcademicsTab('${tab}')" class="px-4 py-2 rounded-lg font-medium transition ${academicsTab === tab ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}">${tab.charAt(0).toUpperCase() + tab.slice(1)}</button>`
+                        ).join('')}
+                    </div>
                     
-                    {activeTab === 'uniform' && (
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="bg-white rounded-xl shadow p-6">
-                                <h3 className="text-lg font-bold mb-4">Boys Uniform</h3>
-                                <div className="space-y-2 text-sm">
+                    ${academicsTab === 'handbooks' ? `
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Student Handbooks</h3>
+                            <div class="grid grid-cols-3 gap-2 mb-4">
+                                ${grades.map(grade => 
+                                    `<button onclick="setSelectedGrade('${grade}')" class="p-2 rounded transition ${selectedGrade === grade ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}">${grade}</button>`
+                                ).join('')}
+                            </div>
+                            <div class="border-2 border-dashed border-blue-300 rounded-lg p-8 text-center">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-blue-600 mb-4"></i>
+                                <h4 class="font-bold mb-2">Upload ${selectedGrade} Handbook</h4>
+                                <input type="file" accept=".pdf" class="hidden" id="handbook-upload">
+                                <label for="handbook-upload" class="bg-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition">Choose File</label>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${academicsTab === 'fees' ? `
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Fee Structure Management</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full border">
+                                    <thead><tr class="bg-gray-50"><th class="border px-4 py-2 text-left">Class</th><th class="border px-4 py-2">Term 1</th><th class="border px-4 py-2">Term 2</th><th class="border px-4 py-2">Term 3</th><th class="border px-4 py-2">Total</th></tr></thead>
+                                    <tbody>
+                                        <tr><td class="border px-4 py-2 font-medium">Play Group</td><td class="border px-4 py-2 text-center">KSh 3,000</td><td class="border px-4 py-2 text-center">KSh 3,000</td><td class="border px-4 py-2 text-center">KSh 3,000</td><td class="border px-4 py-2 text-center font-bold">KSh 9,000</td></tr>
+                                        <tr><td class="border px-4 py-2 font-medium">PP1</td><td class="border px-4 py-2 text-center">KSh 4,500</td><td class="border px-4 py-2 text-center">KSh 4,000</td><td class="border px-4 py-2 text-center">KSh 4,000</td><td class="border px-4 py-2 text-center font-bold">KSh 12,500</td></tr>
+                                        <tr><td class="border px-4 py-2 font-medium">Grade 1-6</td><td class="border px-4 py-2 text-center">KSh 5,500</td><td class="border px-4 py-2 text-center">KSh 5,000</td><td class="border px-4 py-2 text-center">KSh 4,500</td><td class="border px-4 py-2 text-center font-bold">KSh 15,000</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${academicsTab === 'uniform' ? `
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">Boys Uniform</h3>
+                                <div class="space-y-2 text-sm">
                                     <p><strong>Shorts/Trousers:</strong> Charcoal Grey</p>
                                     <p><strong>Shirt:</strong> Green Checked</p>
-                                    <p><strong>Sweater:</strong> Caterpillar green with white stripes, V-shaped</p>
+                                    <p><strong>Sweater:</strong> Caterpillar green with white stripes</p>
                                     <p><strong>Shoes:</strong> Black leather shoes</p>
                                     <p><strong>Socks:</strong> Grey with blue stripes</p>
-                                    <p><strong>PE Kit:</strong> Green tracksuit with white stripes</p>
-                                    <p><strong>T-Shirt:</strong> Green or Yellow</p>
-                                </div>
-                                <div className="mt-4 p-3 bg-gray-50 rounded">
-                                    <p className="font-medium">Uniform Cost: Ksh 2,000</p>
-                                    <p className="text-sm text-gray-600">PE Kit: Ksh 1,500</p>
                                 </div>
                             </div>
-                            <div className="bg-white rounded-xl shadow p-6">
-                                <h3 className="text-lg font-bold mb-4">Girls Uniform</h3>
-                                <div className="space-y-2 text-sm">
-                                    <p><strong>Dress/Skirt:</strong> Green and white checked tunic/skirt</p>
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">Girls Uniform</h3>
+                                <div class="space-y-2 text-sm">
+                                    <p><strong>Dress/Skirt:</strong> Green and white checked tunic</p>
                                     <p><strong>Shirt:</strong> White blouse</p>
-                                    <p><strong>Sweater:</strong> Caterpillar green with white stripes, V-shaped</p>
+                                    <p><strong>Sweater:</strong> Caterpillar green with white stripes</p>
                                     <p><strong>Shoes:</strong> Black leather shoes</p>
                                     <p><strong>Socks:</strong> White with green stripes</p>
-                                    <p><strong>PE Kit:</strong> Green tracksuit with white stripes</p>
-                                    <p><strong>T-Shirt:</strong> Green or Yellow</p>
-                                </div>
-                                <div className="mt-4 p-3 bg-gray-50 rounded">
-                                    <p className="font-medium">Uniform Cost: Ksh 2,000</p>
-                                    <p className="text-sm text-gray-600">PE Kit: Ksh 1,500</p>
                                 </div>
                             </div>
                         </div>
-                    )}
-                    
-                    {activeTab === 'requirements' && (
-                        <div className="bg-white rounded-xl shadow p-6">
-                            <h3 className="text-lg font-bold mb-4">New Pupils Requirements</h3>
-                            <p className="text-sm text-gray-600 mb-4">Items to bring on arrival (will be checked)</p>
-                            <div className="grid md:grid-cols-2 gap-8">
-                                <div>
-                                    <h4 className="font-medium mb-3">Documents & Stationery</h4>
-                                    <div className="space-y-1 text-sm">
-                                        <div className="flex justify-between"><span>Birth Certificate</span><span>1</span></div>
-                                        <div className="flex justify-between"><span>Exercise Books (8 ruled, 2 square)</span><span>10</span></div>
-                                        <div className="flex justify-between"><span>Pencils (Office Point)</span><span>3</span></div>
-                                        <div className="flex justify-between"><span>Sharpeners</span><span>2</span></div>
-                                        <div className="flex justify-between"><span>Crayons</span><span>1 packet</span></div>
-                                        <div className="flex justify-between"><span>Erasers (Rubber)</span><span>2</span></div>
-                                        <div className="flex justify-between"><span>Spring File</span><span>1</span></div>
-                                        <div className="flex justify-between"><span>Story Book</span><span>1</span></div>
-                                        <div className="flex justify-between"><span>NEMIS/UPI Copies</span><span>3</span></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h4 className="font-medium mb-3">Other Items</h4>
-                                    <div className="space-y-1 text-sm">
-                                        <div className="flex justify-between"><span>Tissue Paper</span><span>3</span></div>
-                                        <div className="flex justify-between"><span>Modelling Clay</span><span>1 bar</span></div>
-                                        <div className="flex justify-between"><span>Manila Paper</span><span>4</span></div>
-                                        <div className="flex justify-between"><span>Luminous Paper</span><span>2</span></div>
-                                        <div className="flex justify-between"><span>Cup, Plate & Spoon</span><span>1 set</span></div>
-                                        <div className="flex justify-between"><span>Soap (White Wash)</span><span>1</span></div>
-                                    </div>
-                                    <div className="mt-4 p-3 bg-yellow-50 rounded">
-                                        <p className="text-yellow-800 font-medium text-sm">Important Notes:</p>
-                                        <ul className="text-yellow-700 text-xs mt-1 space-y-1">
-                                            <li>• Textbooks provided for class use only</li>
-                                            <li>• Parents buy homework textbooks</li>
-                                            <li>• Inform school of child's health status</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                    ` : ''}
                 </div>
-            );
-        };
+            `;
+        }
 
-        const NewsManager = () => {
-            const [showForm, setShowForm] = useState(false);
-            const [articles, setArticles] = useState([{id: 1, title: 'Students Win Science Competition', status: 'Published', date: '2024-01-15'}]);
-            const [formData, setFormData] = useState({title: '', content: '', category: 'Achievement'});
-            const handleSubmit = (e) => { e.preventDefault(); setArticles([{id: Date.now(), ...formData, date: new Date().toISOString().split('T')[0]}, ...articles]); setFormData({title: '', content: '', category: 'Achievement'}); setShowForm(false); };
-            return (
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">News Management</h2>
-                    <div className="bg-white rounded-xl shadow p-6 mb-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-bold">Articles</h3>
-                            <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-4 py-2 rounded">{showForm ? 'Cancel' : 'New Article'}</button>
+        function renderNews() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">News Management</h2>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold">Articles (${articles.length})</h3>
+                            <button onclick="toggleNewsForm()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas ${showNewsForm ? 'fa-times' : 'fa-plus'} mr-2"></i>${showNewsForm ? 'Cancel' : 'New Article'}
+                            </button>
                         </div>
-                        {showForm && (
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <input type="text" placeholder="Title" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full p-3 border rounded" required />
-                                <textarea placeholder="Content" value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="w-full p-3 border rounded h-32" required />
-                                <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded">Create</button>
+                        
+                        ${showNewsForm ? `
+                            <form onsubmit="handleNewsSubmit(event)" class="bg-gray-50 rounded-lg p-6 mb-6 space-y-4">
+                                <input type="text" name="title" placeholder="Article Title" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <textarea name="content" placeholder="Article Content" class="w-full p-3 border rounded-lg h-32 focus:border-blue-500 focus:outline-none" required></textarea>
+                                <select name="category" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none">
+                                    <option value="Achievement">Achievement</option>
+                                    <option value="Event">Event</option>
+                                    <option value="Announcement">Announcement</option>
+                                </select>
+                                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-save mr-2"></i>Publish Article
+                                </button>
                             </form>
-                        )}
-                        <div className="space-y-3">
-                            {articles.map((article) => (
-                                <div key={article.id} className="flex justify-between items-center p-3 border rounded">
-                                    <div><h4 className="font-medium">{article.title}</h4><p className="text-sm text-gray-500">{article.date}</p></div>
-                                    <button className="text-red-600"><i className="fas fa-trash"></i></button>
+                        ` : ''}
+                        
+                        <div class="space-y-4">
+                            ${articles.map(article => `
+                                <div class="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50 transition">
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-gray-900">${article.title}</h4>
+                                        <div class="flex items-center space-x-4 text-sm text-gray-500 mt-1">
+                                            <span><i class="fas fa-calendar mr-1"></i>${article.date}</span>
+                                            <span><i class="fas fa-eye mr-1"></i>${article.views} views</span>
+                                            <span class="px-2 py-1 rounded-full text-xs ${article.status === 'Published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${article.status}</span>
+                                        </div>
+                                    </div>
+                                    <button onclick="deleteItem('article', ${article.id})" class="text-red-600 hover:text-red-800 p-2">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
-                            ))}
+                            `).join('')}
                         </div>
                     </div>
                 </div>
-            );
-        };
+            `;
+        }
 
-        const CalendarManager = () => {
-            const [events, setEvents] = useState([{id: 1, title: 'Mid-Term Exams', date: '2024-02-19', category: 'Academic'}]);
-            const [formData, setFormData] = useState({title: '', date: '', category: 'Academic'});
-            const handleSubmit = (e) => { e.preventDefault(); setEvents([...events, {id: Date.now(), ...formData}]); setFormData({title: '', date: '', category: 'Academic'}); };
-            return (
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Calendar Management</h2>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div className="bg-white rounded-xl shadow p-6">
-                            <h3 className="text-lg font-bold mb-4">Add Event</h3>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <input type="text" placeholder="Event Title" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full p-3 border rounded" required />
-                                <input type="date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} className="w-full p-3 border rounded" required />
-                                <select value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full p-3 border rounded">
+        function renderCalendar() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Calendar Management</h2>
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Add New Event</h3>
+                            <form onsubmit="handleEventSubmit(event)" class="space-y-4">
+                                <input type="text" name="title" placeholder="Event Title" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <input type="date" name="date" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <select name="category" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none">
                                     <option value="Academic">Academic</option>
                                     <option value="Sports">Sports</option>
                                     <option value="Cultural">Cultural</option>
+                                    <option value="Administrative">Administrative</option>
                                 </select>
-                                <button type="submit" className="w-full bg-green-600 text-white p-3 rounded">Add Event</button>
+                                <button type="submit" class="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-plus mr-2"></i>Add Event
+                                </button>
                             </form>
                         </div>
-                        <div className="bg-white rounded-xl shadow p-6">
-                            <h3 className="text-lg font-bold mb-4">Events ({events.length})</h3>
-                            <div className="space-y-3">
-                                {events.map((event) => (
-                                    <div key={event.id} className="flex justify-between items-center p-3 border rounded">
-                                        <div><h4 className="font-medium">{event.title}</h4><p className="text-sm text-gray-500">{event.date}</p></div>
-                                        <button className="text-red-600"><i className="fas fa-trash"></i></button>
+                        
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Upcoming Events (${events.length})</h3>
+                            <div class="space-y-3 max-h-96 overflow-y-auto">
+                                ${events.map(event => `
+                                    <div class="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50 transition">
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">${event.title}</h4>
+                                            <div class="flex items-center space-x-3 text-sm text-gray-500 mt-1">
+                                                <span><i class="fas fa-calendar mr-1"></i>${event.date}</span>
+                                                <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">${event.category}</span>
+                                            </div>
+                                        </div>
+                                        <button onclick="deleteItem('event', ${event.id})" class="text-red-600 hover:text-red-800 p-2">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
-                                ))}
+                                `).join('')}
                             </div>
                         </div>
                     </div>
                 </div>
-            );
-        };
+            `;
+        }
 
-        const StaffManager = () => {
-            const [showForm, setShowForm] = useState(false);
-            const [staff, setStaff] = useState([{id: 1, name: 'Dr. Sarah Johnson', position: 'Principal', email: 's.johnson@school.edu'}]);
-            const [formData, setFormData] = useState({name: '', position: '', email: ''});
-            const handleSubmit = (e) => { e.preventDefault(); setStaff([...staff, {id: Date.now(), ...formData}]); setFormData({name: '', position: '', email: ''}); setShowForm(false); };
-            return (
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Staff Management</h2>
-                    <div className="bg-white rounded-xl shadow p-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-bold">Staff Directory ({staff.length})</h3>
-                            <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-4 py-2 rounded">{showForm ? 'Cancel' : 'Add Staff'}</button>
+        function renderStaff() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Staff Management</h2>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold">Staff Directory (${staff.length})</h3>
+                            <button onclick="toggleStaffForm()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas ${showStaffForm ? 'fa-times' : 'fa-plus'} mr-2"></i>${showStaffForm ? 'Cancel' : 'Add Staff'}
+                            </button>
                         </div>
-                        {showForm && (
-                            <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded space-y-4">
-                                <input type="text" placeholder="Name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-3 border rounded" required />
-                                <input type="text" placeholder="Position" value={formData.position} onChange={(e) => setFormData({...formData, position: e.target.value})} className="w-full p-3 border rounded" required />
-                                <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full p-3 border rounded" required />
-                                <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded">Add Staff</button>
-                            </form>
-                        )}
-                        <div className="space-y-3">
-                            {staff.map((member) => (
-                                <div key={member.id} className="flex justify-between items-center p-4 border rounded">
-                                    <div><h4 className="font-medium">{member.name}</h4><p className="text-sm text-gray-500">{member.position}</p><p className="text-sm text-gray-400">{member.email}</p></div>
-                                    <button className="text-red-600"><i className="fas fa-trash"></i></button>
+                        
+                        ${showStaffForm ? `
+                            <form onsubmit="handleStaffSubmit(event)" class="bg-gray-50 rounded-lg p-6 mb-6 space-y-4">
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <input type="text" name="name" placeholder="Full Name" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                    <input type="text" name="position" placeholder="Position" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
                                 </div>
-                            ))}
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <input type="email" name="email" placeholder="Email Address" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                    <input type="text" name="department" placeholder="Department" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                </div>
+                                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-save mr-2"></i>Add Staff Member
+                                </button>
+                            </form>
+                        ` : ''}
+                        
+                        <div class="grid gap-4">
+                            ${staff.map(member => `
+                                <div class="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50 transition">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-user text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">${member.name}</h4>
+                                            <p class="text-sm text-gray-500">${member.position} • ${member.department}</p>
+                                            <p class="text-sm text-gray-400">${member.email}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">${member.status}</span>
+                                        <button onclick="deleteItem('staff', ${member.id})" class="text-red-600 hover:text-red-800 p-2">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 </div>
-            );
-        };
+            `;
+        }
 
-        const PoliciesManager = () => {
-            const [policies, setPolicies] = useState([{id: 1, title: 'Academic Integrity Policy', category: 'Academic', status: 'Active'}]);
-            const [showForm, setShowForm] = useState(false);
-            const [formData, setFormData] = useState({title: '', category: 'Academic', content: ''});
-            const handleSubmit = (e) => { e.preventDefault(); setPolicies([...policies, {id: Date.now(), ...formData, status: 'Active'}]); setFormData({title: '', category: 'Academic', content: ''}); setShowForm(false); };
-            return (
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Policies Management</h2>
-                    <div className="bg-white rounded-xl shadow p-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-bold">Policies</h3>
-                            <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-4 py-2 rounded">{showForm ? 'Cancel' : 'Add Policy'}</button>
+        function renderPolicies() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Policies Management</h2>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold">School Policies (${policies.length})</h3>
+                            <button onclick="togglePolicyForm()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas ${showPolicyForm ? 'fa-times' : 'fa-plus'} mr-2"></i>${showPolicyForm ? 'Cancel' : 'Add Policy'}
+                            </button>
                         </div>
-                        {showForm && (
-                            <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded space-y-4">
-                                <input type="text" placeholder="Policy Title" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full p-3 border rounded" required />
-                                <select value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full p-3 border rounded">
+                        
+                        ${showPolicyForm ? `
+                            <form onsubmit="handlePolicySubmit(event)" class="bg-gray-50 rounded-lg p-6 mb-6 space-y-4">
+                                <input type="text" name="title" placeholder="Policy Title" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <select name="category" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none">
                                     <option value="Academic">Academic</option>
-                                    <option value="Student">Student</option>
-                                    <option value="Safety">Safety</option>
+                                    <option value="Student">Student Conduct</option>
+                                    <option value="Safety">Safety & Security</option>
+                                    <option value="Administrative">Administrative</option>
                                 </select>
-                                <textarea placeholder="Content" value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="w-full p-3 border rounded h-32" required />
-                                <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded">Add Policy</button>
+                                <textarea name="content" placeholder="Policy Content" class="w-full p-3 border rounded-lg h-32 focus:border-blue-500 focus:outline-none" required></textarea>
+                                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-save mr-2"></i>Add Policy
+                                </button>
                             </form>
-                        )}
-                        <div className="space-y-3">
-                            {policies.map((policy) => (
-                                <div key={policy.id} className="p-3 border rounded">
-                                    <div className="flex justify-between items-start">
-                                        <div><h4 className="font-medium">{policy.title}</h4><p className="text-sm text-gray-500">{policy.category}</p></div>
-                                        <button className="text-red-600"><i className="fas fa-trash"></i></button>
+                        ` : ''}
+                        
+                        <div class="space-y-4">
+                            ${policies.map(policy => `
+                                <div class="p-4 border rounded-lg hover:bg-gray-50 transition">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1">
+                                            <h4 class="font-medium text-gray-900">${policy.title}</h4>
+                                            <div class="flex items-center space-x-4 text-sm text-gray-500 mt-1">
+                                                <span><i class="fas fa-tag mr-1"></i>${policy.category}</span>
+                                                <span><i class="fas fa-calendar mr-1"></i>Updated: ${policy.lastUpdated}</span>
+                                                <span class="px-2 py-1 rounded-full text-xs ${policy.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${policy.status}</span>
+                                            </div>
+                                        </div>
+                                        <button onclick="deleteItem('policy', ${policy.id})" class="text-red-600 hover:text-red-800 p-2">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 </div>
-                            ))}
+                            `).join('')}
                         </div>
                     </div>
                 </div>
-            );
-        };
+            `;
+        }
 
-        const ContactsManager = () => {
-            const [contacts] = useState([{id: 1, name: 'John Smith', email: 'john@example.com', subject: 'Admission Inquiry', status: 'New'}]);
-            return (
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Contacts Management</h2>
-                    <div className="bg-white rounded-xl shadow p-6">
-                        <h3 className="text-lg font-bold mb-4">Messages ({contacts.length})</h3>
-                        <div className="space-y-4">
-                            {contacts.map((contact) => (
-                                <div key={contact.id} className="p-4 border rounded">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div><h4 className="font-medium">{contact.name}</h4><p className="text-sm text-gray-500">{contact.email}</p></div>
-                                        <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">{contact.status}</span>
+        function renderContacts() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Contact Messages</h2>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold mb-4">Inbox (${contacts.length})</h3>
+                        <div class="space-y-4">
+                            ${contacts.map(contact => `
+                                <div class="p-4 border rounded-lg hover:bg-gray-50 transition">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="flex-1">
+                                            <div class="flex items-center space-x-3">
+                                                <h4 class="font-medium text-gray-900">${contact.name}</h4>
+                                                <span class="px-2 py-1 text-xs rounded-full ${contact.priority === 'High' ? 'bg-red-100 text-red-800' : contact.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">${contact.priority}</span>
+                                                <span class="px-2 py-1 text-xs rounded-full ${contact.status === 'New' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}">${contact.status}</span>
+                                            </div>
+                                            <p class="text-sm text-gray-500 mt-1">${contact.email} • ${contact.date}</p>
+                                            <p class="text-sm text-gray-600 mt-2">Subject: ${contact.subject}</p>
+                                        </div>
                                     </div>
-                                    <p className="text-sm text-gray-600 mb-3">Subject: {contact.subject}</p>
-                                    <div className="flex space-x-2">
-                                        <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded">Reply</button>
-                                        <button className="px-3 py-1 border text-sm rounded">View</button>
-                                        <button className="px-3 py-1 text-red-600 text-sm">Delete</button>
+                                    <div class="flex space-x-2">
+                                        <button onclick="updateContactStatus(${contact.id}, 'Replied')" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition">
+                                            <i class="fas fa-reply mr-1"></i>Reply
+                                        </button>
+                                        <button onclick="updateContactStatus(${contact.id}, 'Resolved')" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition">
+                                            <i class="fas fa-check mr-1"></i>Resolve
+                                        </button>
+                                        <button onclick="deleteItem('contact', ${contact.id})" class="px-3 py-1 text-red-600 text-sm hover:text-red-800 transition">
+                                            <i class="fas fa-trash mr-1"></i>Delete
+                                        </button>
                                     </div>
                                 </div>
-                            ))}
+                            `).join('')}
                         </div>
                     </div>
                 </div>
-            );
-        };
+            `;
+        }
 
-        const App = () => {
-            return (
-                <Router>
-                    {(currentHash) => {
-                        if (currentHash === '#/admin') {
-                            const user = checkAuth();
-                            if (user) {
-                                return <AdminDashboard />;
-                            } else {
-                                window.location.hash = '#/login';
-                                return null;
-                            }
-                        } else if (currentHash === '#/login') {
-                            return <AdminLogin />;
-                        } else {
-                            return <AdminLogin />;
-                        }
-                    }}
-                </Router>
-            );
-        };
+        function renderContent() {
+            switch(activeSection) {
+                case 'academics': return renderAcademics();
+                case 'news': return renderNews();
+                case 'calendar': return renderCalendar();
+                case 'staff': return renderStaff();
+                case 'policies': return renderPolicies();
+                case 'contacts': return renderContacts();
+                default: return renderDashboard();
+            }
+        }
 
-        const root = createRoot(document.getElementById('root'));
-        root.render(<App />);
+        function renderMainLayout() {
+            return `
+                <div class="min-h-screen bg-gray-50 flex">
+                    <!-- Sidebar -->
+                    <div class="w-64 bg-white shadow-xl flex flex-col">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-graduation-cap text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h1 class="text-xl font-bold text-gray-900">Admin Panel</h1>
+                                    <p class="text-sm text-gray-600">${currentUser?.name}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <nav class="p-4 flex-1">
+                            ${[
+                                {id: 'dashboard', label: 'Dashboard', icon: 'tachometer-alt'},
+                                {id: 'academics', label: 'Academics', icon: 'graduation-cap'},
+                                {id: 'news', label: 'News', icon: 'newspaper'},
+                                {id: 'calendar', label: 'Calendar', icon: 'calendar-alt'},
+                                {id: 'staff', label: 'Staff', icon: 'users'},
+                                {id: 'policies', label: 'Policies', icon: 'file-alt'},
+                                {id: 'contacts', label: 'Messages', icon: 'envelope'}
+                            ].map(item => `
+                                <button onclick="setActiveSection('${item.id}')" class="sidebar-item w-full text-left px-4 py-3 rounded-xl mb-2 flex items-center space-x-3 transition-all duration-200 ${activeSection === item.id ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium shadow-lg' : 'text-gray-600 hover:bg-gray-100'}">
+                                    <i class="fas fa-${item.icon} text-lg"></i>
+                                    <span>${item.label}</span>
+                                </button>
+                            `).join('')}
+                        </nav>
+                        
+                        <div class="mt-auto p-4 border-t border-gray-200 space-y-2">
+                            <button onclick="window.location.href = 'home.html'" class="w-full px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                <i class="fas fa-home mr-2"></i>View Website
+                            </button>
+                            <button onclick="logoutUser()" class="w-full px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Content -->
+                    <div class="flex-1 p-8 overflow-y-auto">
+                        ${renderContent()}
+                    </div>
+                </div>
+                ${renderNotifications()}
+            `;
+        }
+
+        // Main render function
+        function render() {
+            const root = document.getElementById('root');
+            
+            if (!currentUser) {
+                currentUser = checkAuth();
+            }
+            
+            if (currentUser) {
+                root.innerHTML = renderMainLayout();
+            } else {
+                root.innerHTML = renderLogin();
+            }
+        }
+
+        // Initialize app
+        render();
     </script>
 </body>
 </html>
