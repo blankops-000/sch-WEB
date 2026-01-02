@@ -1,11 +1,230 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Outering School</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outering School - Knowledge is Precious</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .hero-stats { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+            .mobile-text-sm { font-size: 0.875rem; }
+            .mobile-text-base { font-size: 1rem; }
+            .mobile-text-lg { font-size: 1.125rem; }
+            .mobile-text-xl { font-size: 1.25rem; }
+            .mobile-text-2xl { font-size: 1.5rem; }
+            .mobile-text-3xl { font-size: 1.875rem; }
+            .mobile-px-4 { padding-left: 1rem; padding-right: 1rem; }
+            .mobile-py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+            .mobile-py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+            .mobile-mb-6 { margin-bottom: 1.5rem; }
+            .mobile-mb-8 { margin-bottom: 2rem; }
+            .mobile-gap-4 { gap: 1rem; }
+            .mobile-gap-6 { gap: 1.5rem; }
+        }
+        
+        @media (max-width: 640px) {
+            .hero-stats { grid-template-columns: 1fr; }
+            .mobile-btn { padding: 0.75rem 1.5rem; font-size: 0.875rem; }
+            .mobile-card-p { padding: 1rem; }
+        }
+    </style>
 </head>
-<body>
-    <h1>🎓 Outering School</h1>
-    <p>Knowledge is Precious</p>
-    <p>📞 Contact: 0722225019</p>
+<body class="font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center overflow-hidden">
+                        <img src="Frontend/OUT.JPEG" alt="Outering School Logo" class="w-10 h-10 object-cover rounded-lg">
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Outering School</h1>
+                        <p class="text-sm opacity-90">Knowledge is Precious</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#home" class="hover:text-yellow-300 transition">Home</a>
+                    <a href="#about" class="hover:text-yellow-300 transition">About</a>
+                    <a href="#academics" class="hover:text-yellow-300 transition">Academics</a>
+                    <a href="#news" class="hover:text-yellow-300 transition">News</a>
+                    <a href="#calendar" class="hover:text-yellow-300 transition">Calendar</a>
+                    <a href="#fees" class="hover:text-yellow-300 transition">Fees</a>
+                    <a href="#application" class="hover:text-yellow-300 transition">Apply Now</a>
+                    <a href="#careers" class="hover:text-yellow-300 transition">Careers</a>
+                    <a href="#staff" class="hover:text-yellow-300 transition">Staff</a>
+                    <a href="#policies" class="hover:text-yellow-300 transition">Policies</a>
+                    <a href="#handbooks" class="hover:text-yellow-300 transition">Handbooks</a>
+                    <a href="#contact" class="hover:text-yellow-300 transition">Contact</a>
+                    <a href="Frontend/admin.html" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-user-shield mr-2"></i>Admin
+                    </a>
+                </nav>
+                <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-4">
+                <div class="flex flex-col space-y-3">
+                    <a href="#home" class="hover:text-yellow-300 transition">Home</a>
+                    <a href="#about" class="hover:text-yellow-300 transition">About</a>
+                    <a href="#academics" class="hover:text-yellow-300 transition">Academics</a>
+                    <a href="#news" class="hover:text-yellow-300 transition">News</a>
+                    <a href="#calendar" class="hover:text-yellow-300 transition">Calendar</a>
+                    <a href="#fees" class="hover:text-yellow-300 transition">Fees</a>
+                    <a href="#application" class="hover:text-yellow-300 transition">Apply Now</a>
+                    <a href="#careers" class="hover:text-yellow-300 transition">Careers</a>
+                    <a href="#staff" class="hover:text-yellow-300 transition">Staff</a>
+                    <a href="#policies" class="hover:text-yellow-300 transition">Policies</a>
+                    <a href="#handbooks" class="hover:text-yellow-300 transition">Handbooks</a>
+                    <a href="#contact" class="hover:text-yellow-300 transition">Contact</a>
+                    <a href="Frontend/admin.html" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition inline-block">
+                        <i class="fas fa-user-shield mr-2"></i>Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="gradient-bg text-white py-12 md:py-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4 md:mb-6">Welcome to Outering School</h2>
+            <p class="text-lg md:text-xl mb-6 md:mb-8 max-w-3xl mx-auto">Grade 10 Approved School & KCSE Centre - Day School for Both Boys and Girls</p>
+            <div class="hero-stats grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8 md:mt-12">
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-bold">800+</div>
+                    <div class="text-sm opacity-90">Students</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-bold">45+</div>
+                    <div class="text-sm opacity-90">Faculty</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-bold">KCSE</div>
+                    <div class="text-sm opacity-90">Centre</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-bold">2026</div>
+                    <div class="text-sm opacity-90">Interviews</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">About Outering School</h2>
+                <p class="text-xl text-gray-600">Knowledge is Precious - Our Guiding Motto</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Our Story</h3>
+                    <p class="text-gray-600 mb-4">Founded in 2005 by the visionary Charles Jb as a non-formal education centre, formally registered as a learning institute in 2007. Our school has a rich heritage rooted in excellence and a deep commitment to education.</p>
+                    <p class="text-gray-600 mb-4">Over the years, we have evolved from a single institution into a dynamic and forward-thinking educational center that nurtures young minds to thrive in an ever-changing world.</p>
+                    <p class="text-gray-600">In our journey of growth, the school transitioned to multi-levels: Pre Primary, Primary, Junior School, High School, and now Senior School with Grade 10 starting in January 2026.</p>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Our Mission & Vision</h3>
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-green-600 mb-2">Mission</h4>
+                        <p class="text-gray-600 mb-4">We nurture every learner's potential.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-green-600 mb-2">Vision</h4>
+                        <p class="text-gray-600 mb-6">To provide quality education at affordable cost and to create centres of excellence in which each child will develop: the highest possible moral, academic, cultural and sporting standards; a wide range of interests, capacities and talents; a strong sense of social responsibility and carry these values into adult life.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-green-600 mb-3">Our Aims</h4>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-start"><i class="fas fa-target text-green-500 mr-3 mt-1"></i>To offer the Kenyan curriculum drawing on best practices</li>
+                            <li class="flex items-start"><i class="fas fa-target text-green-500 mr-3 mt-1"></i>Prove that any child, irrespective of background, has the potential to rise and become the best both in academic and co-curriculum activities</li>
+                            <li class="flex items-start"><i class="fas fa-target text-green-500 mr-3 mt-1"></i>To become a world-class school</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">📢 Call or Visit Us</h2>
+                <p class="text-xl text-gray-600">Get in touch for admissions and inquiries</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">📞 Contacts</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-building text-green-600"></i>
+                            <span class="font-semibold">Office:</span>
+                            <span>0111214554</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-phone text-green-600"></i>
+                            <span>0722225019</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-mobile-alt text-purple-600"></i>
+                            <span>0702891193</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-phone-alt text-red-600"></i>
+                            <span>0111213545</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">📍 Visit Our Location</h3>
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="space-y-3">
+                            <p><i class="fas fa-map-marker-alt text-green-600 mr-2"></i>Mowlem Estate Tononoka</p>
+                            <p><i class="fas fa-road text-green-600 mr-2"></i>Pheroz Road</p>
+                            <p><i class="fas fa-home text-green-600 mr-2"></i>Kiambiu Estate</p>
+                            <p><i class="fas fa-landmark text-green-600 mr-2"></i>Behind Buru Buru</p>
+                        </div>
+                        <div class="mt-6 pt-6 border-t">
+                            <p class="text-center text-gray-600 font-semibold">2026 Interviews Ongoing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center space-x-3 mb-4">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center overflow-hidden">
+                    <img src="Frontend/OUT.JPEG" alt="Outering Schools Logo" class="w-8 h-8 object-cover rounded-lg">
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold">Outering School</h3>
+                    <p class="text-sm opacity-90">Knowledge is Precious</p>
+                </div>
+            </div>
+            <p class="text-sm opacity-75">&copy; 2024 Outering School. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+    </script>
 </body>
 </html>
