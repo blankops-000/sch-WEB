@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outering School - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .sidebar-item:hover {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transform: translateX(4px);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .notification {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script>
+        // State management
+        let currentUser = null;
+        let activeSection = 'dashboard';
+        let academicsTab = 'handbooks';
+        let selectedGrade = 'PP1';
+        let showNewsForm = false;
+        let showStaffForm = false;
+        let showPolicyForm = false;
+        let editingStaff = null;
+        let editingPolicy = null;
+        let editingArticle = null;
+        let editingEvent = null;
+        let notifications = [];
+        
+        // Data storage with enhanced structure
+        let articles = [
+            {id: 1, title: 'Students Win Science Competition', status: 'Published', date: '2024-01-15', views: 245, category: 'Achievement'},
+            {id: 2, title: 'New Library Opening Ceremony', status: 'Draft', date: '2024-01-20', views: 0, category: 'Event'}
+        ];
+        let events = [
+            {id: 1, title: 'Mid-Term Exams', date: '2024-02-19', category: 'Academic', status: 'Upcoming'},
+            {id: 2, title: 'Sports Day', date: '2024-03-15', category: 'Sports', status: 'Planning'}
+        ];
+        
+        // Load existing data from localStorage
+        const savedArticles = localStorage.getItem('admin_articles');
+        if (savedArticles) {
+            articles = JSON.parse(savedArticles);
+        }
+        
+        const savedEvents = localStorage.getItem('admin_events');
+        if (savedEvents) {
+            events = JSON.parse(savedEvents);
+        }
+        
+        // Handbooks storage
+        let handbooks = JSON.parse(localStorage.getItem('admin_handbooks') || '{}');
+        
+        // Handle handbook upload
+        function handleHandbookUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    handbooks[selectedGrade] = {
+                        name: file.name,
+                        data: e.target.result,
+                        uploadDate: new Date().toISOString()
+                    };
+                    localStorage.setItem('admin_handbooks', JSON.stringify(handbooks));
+                    showNotification(`${selectedGrade} handbook uploaded successfully!`);
+                    render();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showNotification('Please select a PDF file', 'error');
+            }
+        }
+        let staff = [
+            {id: 1, name: 'Dr. Sarah Johnson', position: 'Principal', email: 's.johnson@outeringschool.ac.ke', department: 'Administration', status: 'Active'},
+            {id: 2, name: 'Mr. James Wilson', position: 'Math Teacher', email: 'j.wilson@outeringschool.ac.ke', department: 'Mathematics', status: 'Active'},
+            {id: 3, name: 'Ms. Mary Wanjiku', position: 'English Teacher', email: 'm.wanjiku@outeringschool.ac.ke', department: 'Languages', status: 'Active'},
+            {id: 4, name: 'Mr. Peter Kimani', position: 'Science Teacher', email: 'p.kimani@outeringschool.ac.ke', department: 'Sciences', status: 'Active'},
+            {id: 5, name: 'Ms. Grace Achieng', position: 'Deputy Principal', email: 'g.achieng@outeringschool.ac.ke', department: 'Administration', status: 'Active'},
+            {id: 6, name: 'Mr. David Mwangi', position: 'Sports Coordinator', email: 'd.mwangi@outeringschool.ac.ke', department: 'Physical Education', status: 'Active'}
+        ];
+        let policies = [
+            {id: 1, title: 'Academic Integrity Policy', category: 'Academic', status: 'Active', lastUpdated: '2024-01-10', description: 'Guidelines for maintaining honesty and fairness in all academic work and assessments.'},
+            {id: 2, title: 'Student Code of Conduct', category: 'Student', status: 'Active', lastUpdated: '2024-01-05', description: 'Expected behavior standards for all students to ensure a safe and respectful learning environment.'},
+            {id: 3, title: 'Safety & Security Policy', category: 'Safety', status: 'Active', lastUpdated: '2024-01-15', description: 'Comprehensive safety measures and emergency procedures to protect all members of our school community.'},
+            {id: 4, title: 'Anti-Bullying Policy', category: 'Student', status: 'Active', lastUpdated: '2024-01-08', description: 'Zero-tolerance approach to bullying with clear reporting procedures and support systems.'}
+        ];
+        
+        // Load existing data from localStorage
+        const savedStaff = localStorage.getItem('admin_staff');
+        if (savedStaff) {
+            staff = JSON.parse(savedStaff);
+        }
+        
+        const savedPolicies = localStorage.getItem('admin_policies');
+        if (savedPolicies) {
+            policies = JSON.parse(savedPolicies);
+        }
+
+        const grades = ['PP1', 'PP2', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Form 3', 'Form 4'];
+        
+        // Utility functions
+        function showNotification(message, type = 'success') {
+            const notification = {
+                id: Date.now(),
+                message,
+                type,
+                timestamp: new Date()
+            };
+            notifications.unshift(notification);
+            setTimeout(() => {
+                notifications = notifications.filter(n => n.id !== notification.id);
+                render();
+            }, 5000);
+            render();
+        }
+        
+        // Authentication
+        const checkAuth = () => {
+            const storedUser = localStorage.getItem('admin_user');
+            if (storedUser) {
+                try {
+                    return JSON.parse(storedUser);
+                } catch (e) {
+                    localStorage.removeItem('admin_user');
+                }
+            }
+            return null;
+        };
+        
+        const loginUser = (username, password) => {
+            if (username.toLowerCase().trim() === 'admin' && password.trim() === 'outering2024') {
+                const userData = { id: 1, name: 'Administrator', username, role: 'admin', loginTime: new Date() };
+                localStorage.setItem('admin_user', JSON.stringify(userData));
+                showNotification('Welcome back, Administrator!');
+                return { success: true, user: userData };
+            }
+            return { success: false, message: 'Invalid credentials' };
+        };
+        
+        const logoutUser = () => {
+            localStorage.removeItem('admin_user');
+            currentUser = null;
+            showNotification('Logged out successfully');
+            render();
+        };
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            }
+        }
+        
+        // Event handlers
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('error-message');
+            
+            const result = loginUser(username, password);
+            
+            if (result.success) {
+                currentUser = result.user;
+                render();
+            } else {
+                errorDiv.textContent = result.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function setActiveSection(section) {
+            activeSection = section;
+            render();
+        }
+
+        function setAcademicsTab(tab) {
+            academicsTab = tab;
+            render();
+        }
+
+        function setSelectedGrade(grade) {
+            selectedGrade = grade;
+            render();
+        }
+
+        function toggleNewsForm() {
+            showNewsForm = !showNewsForm;
+            editingArticle = null;
+            render();
+        }
+
+        function toggleStaffForm() {
+            showStaffForm = !showStaffForm;
+            editingStaff = null;
+            render();
+        }
+
+        function togglePolicyForm() {
+            showPolicyForm = !showPolicyForm;
+            editingPolicy = null;
+            render();
+        }
+
+        function editArticle(id) {
+            editingArticle = articles.find(a => a.id === id);
+            showNewsForm = true;
+            render();
+        }
+
+        function editEvent(id) {
+            editingEvent = events.find(e => e.id === id);
+            render();
+        }
+
+        function editStaff(id) {
+            editingStaff = staff.find(s => s.id === id);
+            showStaffForm = true;
+            render();
+        }
+
+        function editPolicy(id) {
+            editingPolicy = policies.find(p => p.id === id);
+            showPolicyForm = true;
+            render();
+        }
+
+        function handleNewsSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            if (editingArticle) {
+                // Update existing article
+                const index = articles.findIndex(a => a.id === editingArticle.id);
+                articles[index] = {
+                    ...editingArticle,
+                    title: formData.get('title'),
+                    content: formData.get('content'),
+                    category: formData.get('category'),
+                    date: new Date().toISOString().split('T')[0]
+                };
+                showNotification('Article updated successfully!');
+            } else {
+                // Add new article
+                const newArticle = {
+                    id: Date.now(),
+                    title: formData.get('title'),
+                    content: formData.get('content'),
+                    category: formData.get('category'),
+                    date: new Date().toISOString().split('T')[0],
+                    status: 'Published',
+                    views: 0
+                };
+                articles.unshift(newArticle);
+                showNotification('Article published successfully!');
+            }
+            
+            localStorage.setItem('admin_articles', JSON.stringify(articles));
+            showNewsForm = false;
+            editingArticle = null;
+            render();
+        }
+
+        function handleEventSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            if (editingEvent) {
+                // Update existing event
+                const index = events.findIndex(e => e.id === editingEvent.id);
+                events[index] = {
+                    ...editingEvent,
+                    title: formData.get('title'),
+                    date: formData.get('date'),
+                    category: formData.get('category'),
+                    description: formData.get('description') || 'Event details will be announced soon.'
+                };
+                showNotification('Event updated successfully!');
+                editingEvent = null;
+            } else {
+                // Add new event
+                const newEvent = {
+                    id: Date.now(),
+                    title: formData.get('title'),
+                    date: formData.get('date'),
+                    category: formData.get('category'),
+                    description: formData.get('description') || 'Event details will be announced soon.',
+                    status: 'Upcoming'
+                };
+                events.push(newEvent);
+                showNotification('Event created successfully!');
+            }
+            
+            localStorage.setItem('admin_events', JSON.stringify(events));
+            event.target.reset();
+            render();
+        }
+
+        function handleStaffSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            if (editingStaff) {
+                // Update existing staff
+                const index = staff.findIndex(s => s.id === editingStaff.id);
+                staff[index] = {
+                    ...editingStaff,
+                    name: formData.get('name'),
+                    position: formData.get('position'),
+                    email: formData.get('email'),
+                    department: formData.get('department')
+                };
+                showNotification('Staff member updated successfully!');
+            } else {
+                // Add new staff
+                const newStaff = {
+                    id: Date.now(),
+                    name: formData.get('name'),
+                    position: formData.get('position'),
+                    email: formData.get('email'),
+                    department: formData.get('department'),
+                    status: 'Active'
+                };
+                staff.push(newStaff);
+                showNotification('Staff member added successfully!');
+            }
+            
+            localStorage.setItem('admin_staff', JSON.stringify(staff));
+            showStaffForm = false;
+            editingStaff = null;
+            render();
+        }
+
+        function handlePolicySubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            if (editingPolicy) {
+                // Update existing policy
+                const index = policies.findIndex(p => p.id === editingPolicy.id);
+                policies[index] = {
+                    ...editingPolicy,
+                    title: formData.get('title'),
+                    category: formData.get('category'),
+                    content: formData.get('content'),
+                    description: formData.get('content'),
+                    lastUpdated: new Date().toISOString().split('T')[0]
+                };
+                showNotification('Policy updated successfully!');
+            } else {
+                // Add new policy
+                const newPolicy = {
+                    id: Date.now(),
+                    title: formData.get('title'),
+                    category: formData.get('category'),
+                    content: formData.get('content'),
+                    description: formData.get('content'),
+                    status: 'Active',
+                    lastUpdated: new Date().toISOString().split('T')[0]
+                };
+                policies.push(newPolicy);
+                showNotification('Policy added successfully!');
+            }
+            
+            localStorage.setItem('admin_policies', JSON.stringify(policies));
+            showPolicyForm = false;
+            editingPolicy = null;
+            render();
+        }
+
+        function deleteItem(type, id) {
+            switch(type) {
+                case 'article':
+                    articles = articles.filter(a => a.id !== id);
+                    localStorage.setItem('admin_articles', JSON.stringify(articles));
+                    showNotification('Article deleted');
+                    break;
+                case 'event':
+                    events = events.filter(e => e.id !== id);
+                    localStorage.setItem('admin_events', JSON.stringify(events));
+                    showNotification('Event deleted');
+                    break;
+                case 'staff':
+                    staff = staff.filter(s => s.id !== id);
+                    localStorage.setItem('admin_staff', JSON.stringify(staff));
+                    showNotification('Staff member removed');
+                    break;
+                case 'policy':
+                    policies = policies.filter(p => p.id !== id);
+                    localStorage.setItem('admin_policies', JSON.stringify(policies));
+                    showNotification('Policy deleted');
+                    break;
+            }
+            render();
+        }
+
+        // Component renderers
+        function renderNotifications() {
+            if (notifications.length === 0) return '';
+            
+            return `
+                <div class="fixed top-4 right-4 z-50 space-y-2">
+                    ${notifications.map(notif => `
+                        <div class="notification bg-white border-l-4 ${notif.type === 'success' ? 'border-green-500' : 'border-red-500'} rounded-lg shadow-lg p-4 max-w-sm">
+                            <div class="flex items-center">
+                                <i class="fas ${notif.type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500'} mr-3"></i>
+                                <p class="text-sm font-medium text-gray-900">${notif.message}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderLogin() {
+            return `
+                <div class="min-h-screen flex items-center justify-center gradient-bg">
+                    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl animate-fade-in">
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-graduation-cap text-white text-3xl"></i>
+                            </div>
+                            <h2 class="text-3xl font-bold text-gray-900">Admin Portal</h2>
+                            <p class="text-gray-600 mt-2">Outering School Management System</p>
+                        </div>
+                        
+                        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+                        
+                        <form onsubmit="handleLogin(event)" class="space-y-6">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Username</label>
+                                <div class="relative">
+                                    <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" id="username" required class="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition" placeholder="Enter username">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Password</label>
+                                <div class="relative">
+                                    <i class="fas fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="password" id="password" required class="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition" placeholder="Enter password">
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition transform hover:scale-105">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Access Admin Panel
+                            </button>
+                        </form>
+                        
+                        <div class="mt-8 text-center">
+                            <button type="button" onclick="window.location.href = 'home.html'" class="text-blue-600 hover:text-blue-800 font-medium">
+                                <i class="fas fa-arrow-left mr-2"></i>Back to Website
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                ${renderNotifications()}
+            `;
+        }
+
+        function renderDashboard() {
+            const totalStudents = 956;
+            const totalRevenue = 45000000; // KSh
+            const attendanceRate = 94.5;
+            
+            return `
+                <div class="animate-fade-in">
+                    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-8">
+                        <div class="mb-4 lg:mb-0">
+                            <h2 class="text-2xl lg:text-3xl font-bold text-gray-900">Dashboard Overview</h2>
+                            <p class="text-gray-600">Welcome back, ${currentUser?.name}</p>
+                        </div>
+                        <div class="text-left lg:text-right">
+                            <p class="text-sm text-gray-500">Last login</p>
+                            <p class="font-medium">${new Date().toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-blue-100 text-sm">Total Students</p>
+                                    <p class="text-2xl lg:text-3xl font-bold">${totalStudents.toLocaleString()}</p>
+                                    <p class="text-xs lg:text-sm text-blue-100 mt-1">+12 this month</p>
+                                </div>
+                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-users text-lg lg:text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-green-100 text-sm">Total Staff</p>
+                                    <p class="text-2xl lg:text-3xl font-bold">${staff.length}</p>
+                                    <p class="text-xs lg:text-sm text-green-100 mt-1">All departments</p>
+                                </div>
+                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-chalkboard-teacher text-lg lg:text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-purple-100 text-sm">Revenue (KSh)</p>
+                                    <p class="text-2xl lg:text-3xl font-bold">${(totalRevenue/1000000).toFixed(1)}M</p>
+                                    <p class="text-xs lg:text-sm text-purple-100 mt-1">This academic year</p>
+                                </div>
+                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-chart-line text-lg lg:text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-orange-100 text-sm">Attendance</p>
+                                    <p class="text-2xl lg:text-3xl font-bold">${attendanceRate}%</p>
+                                    <p class="text-xs lg:text-sm text-orange-100 mt-1">This week</p>
+                                </div>
+                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20">
+                                    <i class="fas fa-calendar-check text-lg lg:text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6 mb-8">
+                        <h3 class="text-lg lg:text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="setActiveSection('news')" class="w-full p-3 lg:p-4 border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                                        <i class="fas fa-newspaper text-purple-600 text-sm lg:text-base"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 text-sm lg:text-base">Publish News</h4>
+                                        <p class="text-xs lg:text-sm text-gray-500">Create new article</p>
+                                    </div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="setActiveSection('calendar')" class="w-full p-3 lg:p-4 border-2 border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all text-left">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                                        <i class="fas fa-calendar-plus text-green-600 text-sm lg:text-base"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 text-sm lg:text-base">Schedule Event</h4>
+                                        <p class="text-xs lg:text-sm text-gray-500">Add to calendar</p>
+                                    </div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="setActiveSection('staff')" class="w-full p-3 lg:p-4 border-2 border-gray-200 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition-all text-left">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                                        <i class="fas fa-user-tie text-orange-600 text-sm lg:text-base"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 text-sm lg:text-base">Add Staff</h4>
+                                        <p class="text-xs lg:text-sm text-gray-500">New team member</p>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="grid lg:grid-cols-2 gap-6 lg:gap-8">
+                        <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                            <h3 class="text-lg lg:text-xl font-bold text-gray-900 mb-4">Recent Articles</h3>
+                            <div class="space-y-3">
+                                ${articles.slice(0, 3).map(article => `
+                                    <div class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="font-medium text-gray-900 text-sm lg:text-base truncate">${article.title}</h4>
+                                            <p class="text-xs lg:text-sm text-gray-500">${article.date} • ${article.views} views</p>
+                                        </div>
+                                        <span class="px-2 py-1 text-xs rounded-full ml-2 ${article.status === 'Published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${article.status}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                            <h3 class="text-lg lg:text-xl font-bold text-gray-900 mb-4">Upcoming Events</h3>
+                            <div class="space-y-3">
+                                ${events.slice(0, 3).map(event => `
+                                    <div class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="font-medium text-gray-900 text-sm lg:text-base truncate">${event.title}</h4>
+                                            <p class="text-xs lg:text-sm text-gray-500">${event.date} • ${event.category}</p>
+                                        </div>
+                                        <span class="px-2 py-1 text-xs rounded-full ml-2 bg-blue-100 text-blue-800">${event.status}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        function renderAcademics() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-6">Academics Management</h2>
+                    <div class="flex space-x-4 mb-6">
+                        <button onclick="setAcademicsTab('handbooks')" class="px-3 lg:px-4 py-2 rounded-lg font-medium transition bg-blue-600 text-white text-sm lg:text-base">Handbooks</button>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+                        <h3 class="text-lg font-bold mb-4">Student Handbooks</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
+                            ${grades.map(grade => 
+                                `<button onclick="setSelectedGrade('${grade}')" class="p-2 rounded transition text-xs lg:text-sm ${selectedGrade === grade ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}">${grade}</button>`
+                            ).join('')}
+                        </div>
+                        <div class="border-2 border-dashed border-blue-300 rounded-lg p-6 lg:p-8 text-center">
+                            <i class="fas fa-cloud-upload-alt text-3xl lg:text-4xl text-blue-600 mb-4"></i>
+                            <h4 class="font-bold mb-2 text-sm lg:text-base">Upload ${selectedGrade} Handbook</h4>
+                            ${handbooks[selectedGrade] ? `
+                                <div class="mb-4 p-3 bg-green-50 rounded-lg">
+                                    <p class="text-green-800 font-medium text-sm lg:text-base">${handbooks[selectedGrade].name}</p>
+                                    <p class="text-green-600 text-xs lg:text-sm">Uploaded: ${new Date(handbooks[selectedGrade].uploadDate).toLocaleDateString()}</p>
+                                </div>
+                            ` : ''}
+                            <input type="file" accept=".pdf" class="hidden" id="handbook-upload" onchange="handleHandbookUpload(event)">
+                            <label for="handbook-upload" class="bg-blue-600 text-white px-4 lg:px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition text-sm lg:text-base">
+                                ${handbooks[selectedGrade] ? 'Replace File' : 'Choose File'}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderNews() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">News Management</h2>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold">Articles (${articles.length})</h3>
+                            <button onclick="toggleNewsForm()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas ${showNewsForm ? 'fa-times' : 'fa-plus'} mr-2"></i>${showNewsForm ? 'Cancel' : 'New Article'}
+                            </button>
+                        </div>
+                        
+                        ${showNewsForm ? `
+                            <form onsubmit="handleNewsSubmit(event)" class="bg-gray-50 rounded-lg p-6 mb-6 space-y-4">
+                                <input type="text" name="title" placeholder="Article Title" value="${editingArticle ? editingArticle.title : ''}" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <textarea name="content" placeholder="Article Content" class="w-full p-3 border rounded-lg h-32 focus:border-blue-500 focus:outline-none" required>${editingArticle ? editingArticle.content : ''}</textarea>
+                                <select name="category" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none">
+                                    <option value="Achievement" ${editingArticle && editingArticle.category === 'Achievement' ? 'selected' : ''}>Achievement</option>
+                                    <option value="Event" ${editingArticle && editingArticle.category === 'Event' ? 'selected' : ''}>Event</option>
+                                    <option value="Announcement" ${editingArticle && editingArticle.category === 'Announcement' ? 'selected' : ''}>Announcement</option>
+                                </select>
+                                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-save mr-2"></i>${editingArticle ? 'Update' : 'Publish'} Article
+                                </button>
+                            </form>
+                        ` : ''}
+                        
+                        <div class="space-y-4">
+                            ${articles.map(article => `
+                                <div class="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50 transition">
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-gray-900">${article.title}</h4>
+                                        <div class="flex items-center space-x-4 text-sm text-gray-500 mt-1">
+                                            <span><i class="fas fa-calendar mr-1"></i>${article.date}</span>
+                                            <span><i class="fas fa-eye mr-1"></i>${article.views} views</span>
+                                            <span class="px-2 py-1 rounded-full text-xs ${article.status === 'Published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${article.status}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="editArticle(${article.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteItem('article', ${article.id})" class="text-red-600 hover:text-red-800 p-2">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCalendar() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Calendar Management</h2>
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Add New Event</h3>
+                            <form onsubmit="handleEventSubmit(event)" class="space-y-4">
+                                <input type="text" name="title" placeholder="Event Title" value="${editingEvent ? editingEvent.title : ''}" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <input type="date" name="date" value="${editingEvent ? editingEvent.date : ''}" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <select name="category" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none">
+                                    <option value="Academic" ${editingEvent && editingEvent.category === 'Academic' ? 'selected' : ''}>Academic</option>
+                                    <option value="Sports" ${editingEvent && editingEvent.category === 'Sports' ? 'selected' : ''}>Sports</option>
+                                    <option value="Cultural" ${editingEvent && editingEvent.category === 'Cultural' ? 'selected' : ''}>Cultural</option>
+                                    <option value="Administrative" ${editingEvent && editingEvent.category === 'Administrative' ? 'selected' : ''}>Administrative</option>
+                                </select>
+                                <textarea name="description" placeholder="Event Description (optional)" class="w-full p-3 border rounded-lg h-24 focus:border-blue-500 focus:outline-none">${editingEvent ? editingEvent.description || '' : ''}</textarea>
+                                <button type="submit" class="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-plus mr-2"></i>${editingEvent ? 'Update' : 'Add'} Event
+                                </button>
+                                ${editingEvent ? `<button type="button" onclick="editingEvent = null; render()" class="w-full bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition mt-2">
+                                    <i class="fas fa-times mr-2"></i>Cancel Edit
+                                </button>` : ''}
+                            </form>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Upcoming Events (${events.length})</h3>
+                            <div class="space-y-3 max-h-96 overflow-y-auto">
+                                ${events.map(event => `
+                                    <div class="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50 transition">
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">${event.title}</h4>
+                                            <div class="flex items-center space-x-3 text-sm text-gray-500 mt-1">
+                                                <span><i class="fas fa-calendar mr-1"></i>${event.date}</span>
+                                                <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">${event.category}</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="editEvent(${event.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteItem('event', ${event.id})" class="text-red-600 hover:text-red-800 p-2">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStaff() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Staff Management</h2>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold">Staff Directory (${staff.length})</h3>
+                            <button onclick="toggleStaffForm()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas ${showStaffForm ? 'fa-times' : 'fa-plus'} mr-2"></i>${showStaffForm ? 'Cancel' : 'Add Staff'}
+                            </button>
+                        </div>
+                        
+                        ${showStaffForm ? `
+                            <form onsubmit="handleStaffSubmit(event)" class="bg-gray-50 rounded-lg p-6 mb-6 space-y-4">
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <input type="text" name="name" placeholder="Full Name" value="${editingStaff ? editingStaff.name : ''}" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                    <input type="text" name="position" placeholder="Position" value="${editingStaff ? editingStaff.position : ''}" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                </div>
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <input type="email" name="email" placeholder="Email Address" value="${editingStaff ? editingStaff.email : ''}" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                    <input type="text" name="department" placeholder="Department" value="${editingStaff ? editingStaff.department : ''}" class="p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                </div>
+                                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-save mr-2"></i>${editingStaff ? 'Update' : 'Add'} Staff Member
+                                </button>
+                            </form>
+                        ` : ''}
+                        
+                        <div class="grid gap-4">
+                            ${staff.map(member => `
+                                <div class="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50 transition">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-user text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">${member.name}</h4>
+                                            <p class="text-sm text-gray-500">${member.position} • ${member.department}</p>
+                                            <p class="text-sm text-gray-400">${member.email}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">${member.status}</span>
+                                        <button onclick="editStaff(${member.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteItem('staff', ${member.id})" class="text-red-600 hover:text-red-800 p-2">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPolicies() {
+            return `
+                <div class="animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Policies Management</h2>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold">School Policies (${policies.length})</h3>
+                            <button onclick="togglePolicyForm()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas ${showPolicyForm ? 'fa-times' : 'fa-plus'} mr-2"></i>${showPolicyForm ? 'Cancel' : 'Add Policy'}
+                            </button>
+                        </div>
+                        
+                        ${showPolicyForm ? `
+                            <form onsubmit="handlePolicySubmit(event)" class="bg-gray-50 rounded-lg p-6 mb-6 space-y-4">
+                                <input type="text" name="title" placeholder="Policy Title" value="${editingPolicy ? editingPolicy.title : ''}" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none" required>
+                                <select name="category" class="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none">
+                                    <option value="Academic" ${editingPolicy && editingPolicy.category === 'Academic' ? 'selected' : ''}>Academic</option>
+                                    <option value="Student" ${editingPolicy && editingPolicy.category === 'Student' ? 'selected' : ''}>Student Conduct</option>
+                                    <option value="Safety" ${editingPolicy && editingPolicy.category === 'Safety' ? 'selected' : ''}>Safety & Security</option>
+                                    <option value="Administrative" ${editingPolicy && editingPolicy.category === 'Administrative' ? 'selected' : ''}>Administrative</option>
+                                </select>
+                                <textarea name="content" placeholder="Policy Description" class="w-full p-3 border rounded-lg h-32 focus:border-blue-500 focus:outline-none" required>${editingPolicy ? editingPolicy.description || editingPolicy.content || '' : ''}</textarea>
+                                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-save mr-2"></i>${editingPolicy ? 'Update' : 'Add'} Policy
+                                </button>
+                            </form>
+                        ` : ''}
+                        
+                        <div class="space-y-4">
+                            ${policies.map(policy => `
+                                <div class="p-4 border rounded-lg hover:bg-gray-50 transition">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1">
+                                            <h4 class="font-medium text-gray-900">${policy.title}</h4>
+                                            <div class="flex items-center space-x-4 text-sm text-gray-500 mt-1">
+                                                <span><i class="fas fa-tag mr-1"></i>${policy.category}</span>
+                                                <span><i class="fas fa-calendar mr-1"></i>Updated: ${policy.lastUpdated}</span>
+                                                <span class="px-2 py-1 rounded-full text-xs ${policy.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${policy.status}</span>
+                                            </div>
+                                            ${policy.description ? `<p class="text-sm text-gray-600 mt-2">${policy.description}</p>` : ''}
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="editPolicy(${policy.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteItem('policy', ${policy.id})" class="text-red-600 hover:text-red-800 p-2">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContent() {
+            switch(activeSection) {
+                case 'academics': return renderAcademics();
+                case 'news': return renderNews();
+                case 'calendar': return renderCalendar();
+                case 'staff': return renderStaff();
+                case 'policies': return renderPolicies();
+                default: return renderDashboard();
+            }
+        }
+
+        function renderMainLayout() {
+            return `
+                <div class="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
+                    <!-- Mobile Header -->
+                    <div class="lg:hidden bg-white shadow-lg p-4 flex justify-between items-center">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-lg font-bold text-gray-900">Admin Panel</h1>
+                                <p class="text-xs text-gray-600">${currentUser?.name}</p>
+                            </div>
+                        </div>
+                        <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Mobile Menu Overlay -->
+                    <div id="mobileMenuOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden lg:hidden" onclick="toggleMobileMenu()"></div>
+                    
+                    <!-- Sidebar -->
+                    <div id="sidebar" class="w-64 bg-white shadow-xl flex flex-col fixed lg:relative inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-50 lg:z-auto">
+                        <div class="p-6 border-b border-gray-200 hidden lg:block">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-graduation-cap text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h1 class="text-xl font-bold text-gray-900">Admin Panel</h1>
+                                    <p class="text-sm text-gray-600">${currentUser?.name}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <nav class="p-4 flex-1 overflow-y-auto">
+                            ${[
+                                {id: 'dashboard', label: 'Dashboard', icon: 'tachometer-alt'},
+                                {id: 'academics', label: 'Academics', icon: 'graduation-cap'},
+                                {id: 'news', label: 'News', icon: 'newspaper'},
+                                {id: 'calendar', label: 'Calendar', icon: 'calendar-alt'},
+                                {id: 'staff', label: 'Staff', icon: 'users'},
+                                {id: 'policies', label: 'Policies', icon: 'file-alt'}
+                            ].map(item => `
+                                <button onclick="setActiveSection('${item.id}'); toggleMobileMenu()" class="sidebar-item w-full text-left px-4 py-3 rounded-xl mb-2 flex items-center space-x-3 transition-all duration-200 ${activeSection === item.id ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium shadow-lg' : 'text-gray-600 hover:bg-gray-100'}">
+                                    <i class="fas fa-${item.icon} text-lg"></i>
+                                    <span>${item.label}</span>
+                                </button>
+                            `).join('')}
+                        </nav>
+                        
+                        <div class="mt-auto p-4 border-t border-gray-200 space-y-2">
+                            <button onclick="window.location.href = 'home.html'" class="w-full px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
+                                <i class="fas fa-home mr-2"></i>View Website
+                            </button>
+                            <button onclick="logoutUser()" class="w-full px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition text-sm">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Content -->
+                    <div class="flex-1 p-4 lg:p-8 overflow-y-auto">
+                        ${renderContent()}
+                    </div>
+                </div>
+                ${renderNotifications()}
+            `;
+        }
+
+        // Main render function
+        function render() {
+            const root = document.getElementById('root');
+            
+            if (!currentUser) {
+                currentUser = checkAuth();
+            }
+            
+            if (currentUser) {
+                root.innerHTML = renderMainLayout();
+            } else {
+                root.innerHTML = renderLogin();
+            }
+        }
+
+        // Initialize app
+        render();
+    </script>
+</body>
+</html>
