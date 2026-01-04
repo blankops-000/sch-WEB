@@ -94,8 +94,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section id="home" class="text-white py-12 md:py-20" style="background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%); position: relative;">
-        <div class="absolute inset-0 opacity-20" style="background-image: url('OUT.jpeg'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+    <section id="home" class="text-white py-12 md:py-20" style="background: linear-gradient(rgba(5, 150, 105, 0.4), rgba(4, 120, 87, 0.4)), url('Welcome.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
         <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
             <h2 class="text-3xl md:text-5xl font-bold mb-4 md:mb-6">Welcome to Outering School</h2>
             <p class="text-lg md:text-xl mb-6 md:mb-8 max-w-3xl mx-auto">Grade 10 Approved School & KCSE Centre - Day School for Both Boys and Girls</p>
@@ -151,6 +150,48 @@
                             <li class="flex items-start"><i class="fas fa-target text-green-500 mr-3 mt-1"></i>Prove that any child, irrespective of background, has the potential to rise and become the best both in academic and co-curriculum activities</li>
                             <li class="flex items-start"><i class="fas fa-target text-green-500 mr-3 mt-1"></i>To become a world-class school</li>
                         </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- School Anthem Section -->
+            <div class="mt-16 bg-green-50 rounded-xl p-8">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">🎵 Our School Anthem</h3>
+                    <div class="max-w-2xl mx-auto">
+                        <div class="bg-white rounded-lg p-6 shadow-md text-left">
+                            <div class="text-gray-700 leading-relaxed space-y-2">
+                                <p><em>Outer-ring my school….</em></p>
+                                <p><em>My home and my life</em></p>
+                                <p><em>Our knowledge precious</em></p>
+                                <p><em>I love thee outa</em></p>
+                                <br>
+                                <p><em>I will sing with strength and joy,</em></p>
+                                <p><em>I will offer thee all my life</em></p>
+                                <p><em>To learn to be champion, champion, champiooooon,</em></p>
+                                <br>
+                                <p><em>When the sun is shining above us</em></p>
+                                <p><em>The Lord is there for us</em></p>
+                                <p><em>Rejoicing in thy name,</em></p>
+                                <br>
+                                <p><em>See no tribe speak no tribe; talk no tribe Outer-ring</em></p>
+                                <br>
+                                <p><em>I fear no one, I hate no one</em></p>
+                                <p><em>My strength my pride in Outer-ring</em></p>
+                                <p><em>Champion!</em></p>
+                                <p><em>Champion, champion, champion…</em></p>
+                                <p><em>I love thee Out…..Outa</em></p>
+                                <p><em>I love thee Outa!</em></p>
+                            </div>
+                        </div>
+                        <div class="mt-6 space-y-3">
+                            <a href="https://youtu.be/GqfbYaHTzoE" target="_blank" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition font-semibold inline-flex items-center mr-4">
+                                <i class="fab fa-youtube mr-2"></i>Listen to Our Anthem
+                            </a>
+                            <a href="https://youtu.be/EiokJGXoDuc?si=vq8ql8UU7cThTesI" target="_blank" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold inline-flex items-center">
+                                <i class="fab fa-youtube mr-2"></i>School Video
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1246,7 +1287,7 @@
                         <div class="mt-6 pt-6 border-t">
                             <p class="text-center text-gray-600 font-semibold mb-4">2026 Interviews Ongoing</p>
                             <div class="text-center">
-                                <a href="https://www.google.com/maps/search/Mowlem+Estate+Tononoka+Pheroz+Road+Kiambiu+Estate+Behind+Buru+Buru+Nairobi" target="_blank" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition inline-flex items-center">
+                                <a href="https://www.google.com/maps/search/Outering+Schools" target="_blank" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition inline-flex items-center">
                                     <i class="fas fa-map-marker-alt mr-2"></i>
                                     Get Directions
                                 </a>
@@ -1431,17 +1472,120 @@
         
         function downloadClassInfo(classType) {
             const classData = {
-                preschool: { title: 'Pre-School (Play Group, PP1-PP2)' },
-                primary: { title: 'Primary School (Grade 1-6)' },
-                junior: { title: 'Junior School (Grade 7-9)' },
-                senior: { title: 'Senior School (Grade 10)' },
-                form: { title: 'Form 3 & Form 4' }
+                preschool: {
+                    title: 'Pre-School (Play Group, PP1-PP2)',
+                    fees: 'Play Group: Term 1: KSh 3,000, Term 2: KSh 3,000, Term 3: KSh 3,000, Total: KSh 9,000\nPP1: Term 1: KSh 4,500, Term 2: KSh 4,000, Term 3: KSh 4,000, Total: KSh 12,500',
+                    requirements: '• Birth certificate\n• Medical report (if applicable)\n• Parent ID copy',
+                    additional: '• Interview: KSh 500\n• Admission: KSh 1,000\n• Feeding Program: KSh 1,000/month'
+                },
+                primary: {
+                    title: 'Primary School (Grade 1-6)',
+                    fees: 'Grade 1-6: Term 1: KSh 5,500, Term 2: KSh 5,000, Term 3: KSh 4,500, Total: KSh 15,000',
+                    requirements: '• KCPE slip (for transfers)\n• Report form from previous school\n• Birth certificate\n• Parent ID copy\n• UPI number',
+                    additional: '• Interview: KSh 500\n• Admission: KSh 1,000\n• Feeding Program: KSh 1,000/month'
+                },
+                junior: {
+                    title: 'Junior School (Grade 7-9)',
+                    fees: 'Grade 7-9: Term 1: KSh 7,500, Term 2: KSh 6,500, Term 3: KSh 5,900, Total: KSh 19,900',
+                    requirements: '• Report form from previous school\n• Assessment Number/KPSEA slip\n• Birth certificate\n• Parent ID copy\n• UPI number\n• Medical report (if applicable)',
+                    additional: '• Interview: KSh 500\n• Admission: KSh 1,000\n• Feeding Program: KSh 1,000/month\n• School ID: KSh 500\n• Activity Fees: KSh 1,500\n• Assessments: KSh 2,500'
+                },
+                senior: {
+                    title: 'Senior School (Grade 10)',
+                    fees: 'Grade 10: Term 1: KSh 9,000, Term 2: KSh 7,500, Term 3: KSh 6,500, Total: KSh 23,000',
+                    requirements: '• KCPE certificate\n• Report form from previous school\n• Birth certificate\n• Parent ID copy\n• UPI number',
+                    additional: '• Interview: KSh 500\n• Admission: KSh 1,000\n• Feeding Program: KSh 1,000/month'
+                },
+                form: {
+                    title: 'Form 3 & Form 4',
+                    fees: 'Form 3 & 4: Term 1: KSh 8,000, Term 2: KSh 7,500, Term 3: KSh 6,500, Total: KSh 22,000',
+                    requirements: '• KCPE certificate\n• Report form from previous school\n• Birth certificate\n• Parent ID copy\n• UPI number\n• Form 4 KCSE Logistics: KSh 5,000',
+                    additional: '• Interview: KSh 500\n• Admission: KSh 1,000\n• Feeding Program: KSh 1,000/month\n• School ID: KSh 500\n• Activity Fees: KSh 1,500\n• Assessments: KSh 2,500'
+                }
             };
             
             const data = classData[classType];
             if (data) {
-                alert(`Downloading ${data.title} information as PDF...`);
+                // Load jsPDF library and generate PDF
+                if (typeof window.jsPDF === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                    script.onload = () => generatePDF(data);
+                    document.head.appendChild(script);
+                } else {
+                    generatePDF(data);
+                }
             }
+        }
+        
+        function generatePDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Header
+            doc.setFontSize(20);
+            doc.text('Outering School', 20, 20);
+            doc.setFontSize(12);
+            doc.text('Knowledge is Precious', 20, 30);
+            
+            // Title
+            doc.setFontSize(16);
+            doc.text(data.title + ' - Fee Structure & Requirements', 20, 50);
+            
+            let yPos = 70;
+            
+            // Fee Structure
+            doc.setFontSize(14);
+            doc.text('FEE STRUCTURE:', 20, yPos);
+            yPos += 10;
+            doc.setFontSize(10);
+            const feeLines = data.fees.split('\n');
+            feeLines.forEach(line => {
+                doc.text(line, 20, yPos);
+                yPos += 8;
+            });
+            
+            yPos += 10;
+            
+            // Requirements
+            doc.setFontSize(14);
+            doc.text('REQUIREMENTS:', 20, yPos);
+            yPos += 10;
+            doc.setFontSize(10);
+            const reqLines = data.requirements.split('\n');
+            reqLines.forEach(line => {
+                doc.text(line, 20, yPos);
+                yPos += 8;
+            });
+            
+            yPos += 10;
+            
+            // Additional Fees
+            doc.setFontSize(14);
+            doc.text('ADDITIONAL FEES:', 20, yPos);
+            yPos += 10;
+            doc.setFontSize(10);
+            const addLines = data.additional.split('\n');
+            addLines.forEach(line => {
+                doc.text(line, 20, yPos);
+                yPos += 8;
+            });
+            
+            yPos += 15;
+            
+            // Payment Info
+            doc.setFontSize(14);
+            doc.text('PAYMENT INFORMATION:', 20, yPos);
+            yPos += 10;
+            doc.setFontSize(10);
+            doc.text('M-PESA: Paybill 400200, Account 40047314', 20, yPos);
+            yPos += 8;
+            doc.text('Bank: Cooperative Bank, Account 01148178679800', 20, yPos);
+            yPos += 15;
+            doc.text('Contact: 0722225019 | info@outeringschool.ac.ke', 20, yPos);
+            
+            // Download
+            doc.save(`${data.title.replace(/[^a-zA-Z0-9]/g, '_')}_Fees_Requirements.pdf`);
         }
         
         // Load news from backend
