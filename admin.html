@@ -8,36 +8,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .sidebar-item:hover {
-            background: linear-gradient(135deg, #10b981, #059669);
-            transform: translateX(4px);
+        :root {
+            --primary: #059669;
+            --secondary: #10b981;
+            --accent: #34d399;
+            --dark-green: #047857;
+            --light-green: #d1fae5;
         }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .notification {
-            animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
+        .gradient-bg { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .gradient-sidebar { background: linear-gradient(180deg, #064e3b 0%, #059669 100%); }
+        .glass-card { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .admin-card { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #10b981; }
+        .btn-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); transition: all 0.3s ease; }
+        .btn-green:hover { background: linear-gradient(135deg, #059669 0%, #047857 100%); transform: translateY(-2px); box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3); }
+        .floating-icon { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .sidebar-item:hover { background: linear-gradient(135deg, #10b981, #059669); transform: translateX(4px); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(5, 150, 105, 0.15); }
+        .glass-effect { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .animate-fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .notification { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
 <body>
@@ -515,27 +507,27 @@
                     
                     <!-- Stats Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
-                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
+                        <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-blue-100 text-sm">Total Students</p>
+                                    <p class="text-green-100 text-sm">Total Students</p>
                                     <p class="text-2xl lg:text-3xl font-bold">${totalStudents.toLocaleString()}</p>
-                                    <p class="text-xs lg:text-sm text-blue-100 mt-1">+12 this month</p>
+                                    <p class="text-xs lg:text-sm text-green-100 mt-1">+12 this month</p>
                                 </div>
-                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20">
+                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20 floating-icon">
                                     <i class="fas fa-users text-lg lg:text-2xl"></i>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
+                        <div class="bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl p-4 lg:p-6 text-white card-hover transition-all duration-300">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-green-100 text-sm">Total Staff</p>
+                                    <p class="text-emerald-100 text-sm">Total Staff</p>
                                     <p class="text-2xl lg:text-3xl font-bold">${staff.length}</p>
-                                    <p class="text-xs lg:text-sm text-green-100 mt-1">All departments</p>
+                                    <p class="text-xs lg:text-sm text-emerald-100 mt-1">All departments</p>
                                 </div>
-                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20">
+                                <div class="p-2 lg:p-3 rounded-lg bg-white bg-opacity-20 floating-icon" style="animation-delay: -1s;">
                                     <i class="fas fa-chalkboard-teacher text-lg lg:text-2xl"></i>
                                 </div>
                             </div>
@@ -572,10 +564,10 @@
                     <div class="bg-white rounded-xl shadow-lg p-4 lg:p-6 mb-8">
                         <h3 class="text-lg lg:text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
                         <div class="space-y-3">
-                            <button onclick="setActiveSection('news')" class="w-full p-3 lg:p-4 border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left">
+                            <button onclick="setActiveSection('news')" class="w-full p-3 lg:p-4 border-2 border-green-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all text-left admin-card">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                                        <i class="fas fa-newspaper text-purple-600 text-sm lg:text-base"></i>
+                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                                        <i class="fas fa-newspaper text-green-600 text-sm lg:text-base"></i>
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-gray-900 text-sm lg:text-base">Publish News</h4>
@@ -584,10 +576,10 @@
                                 </div>
                             </button>
                             
-                            <button onclick="setActiveSection('calendar')" class="w-full p-3 lg:p-4 border-2 border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all text-left">
+                            <button onclick="setActiveSection('calendar')" class="w-full p-3 lg:p-4 border-2 border-emerald-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50 transition-all text-left admin-card">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                                        <i class="fas fa-calendar-plus text-green-600 text-sm lg:text-base"></i>
+                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                                        <i class="fas fa-calendar-plus text-emerald-600 text-sm lg:text-base"></i>
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-gray-900 text-sm lg:text-base">Schedule Event</h4>
@@ -596,10 +588,10 @@
                                 </div>
                             </button>
                             
-                            <button onclick="setActiveSection('staff')" class="w-full p-3 lg:p-4 border-2 border-gray-200 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition-all text-left">
+                            <button onclick="setActiveSection('staff')" class="w-full p-3 lg:p-4 border-2 border-green-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all text-left admin-card">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                                        <i class="fas fa-user-tie text-orange-600 text-sm lg:text-base"></i>
+                                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                                        <i class="fas fa-user-tie text-green-600 text-sm lg:text-base"></i>
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-gray-900 text-sm lg:text-base">Add Staff</h4>
@@ -686,7 +678,7 @@
                     <div class="bg-white rounded-xl shadow-lg p-6">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-lg font-bold">Articles (${articles.length})</h3>
-                            <button onclick="toggleNewsForm()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                            <button onclick="toggleNewsForm()" class="btn-green text-white px-6 py-2 rounded-lg font-medium">
                                 <i class="fas ${showNewsForm ? 'fa-times' : 'fa-plus'} mr-2"></i>${showNewsForm ? 'Cancel' : 'New Article'}
                             </button>
                         </div>
@@ -700,7 +692,7 @@
                                     <option value="Event" ${editingArticle && editingArticle.category === 'Event' ? 'selected' : ''}>Event</option>
                                     <option value="Announcement" ${editingArticle && editingArticle.category === 'Announcement' ? 'selected' : ''}>Announcement</option>
                                 </select>
-                                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                                <button type="submit" class="btn-green text-white px-6 py-2 rounded-lg font-medium">
                                     <i class="fas fa-save mr-2"></i>${editingArticle ? 'Update' : 'Publish'} Article
                                 </button>
                             </form>
@@ -960,7 +952,7 @@
                                 {id: 'staff', label: 'Staff', icon: 'users'},
                                 {id: 'policies', label: 'Policies', icon: 'file-alt'}
                             ].map(item => `
-                                <button onclick="setActiveSection('${item.id}'); toggleMobileMenu()" class="sidebar-item w-full text-left px-4 py-3 rounded-xl mb-2 flex items-center space-x-3 transition-all duration-200 ${activeSection === item.id ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium shadow-lg' : 'text-gray-600 hover:bg-gray-100'}">
+                                <button onclick="setActiveSection('${item.id}'); toggleMobileMenu()" class="sidebar-item w-full text-left px-4 py-3 rounded-xl mb-2 flex items-center space-x-3 transition-all duration-200 ${activeSection === item.id ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium shadow-lg' : 'text-gray-600 hover:bg-green-50 hover:text-green-700'}">
                                     <i class="fas fa-${item.icon} text-lg"></i>
                                     <span>${item.label}</span>
                                 </button>

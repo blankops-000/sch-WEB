@@ -94,7 +94,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section id="home" class="gradient-bg text-white py-12 md:py-20">
+    <section id="home" class="text-white py-12 md:py-20" style="background: linear-gradient(rgba(5, 150, 105, 0.8), rgba(4, 120, 87, 0.8)), url('welcome.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-5xl font-bold mb-4 md:mb-6">Welcome to Outering School</h2>
             <p class="text-lg md:text-xl mb-6 md:mb-8 max-w-3xl mx-auto">Grade 10 Approved School & KCSE Centre - Day School for Both Boys and Girls</p>
@@ -1243,7 +1243,13 @@
                             <p><i class="fas fa-landmark text-green-600 mr-2"></i>Behind Buru Buru</p>
                         </div>
                         <div class="mt-6 pt-6 border-t">
-                            <p class="text-center text-gray-600 font-semibold">2026 Interviews Ongoing</p>
+                            <p class="text-center text-gray-600 font-semibold mb-4">2026 Interviews Ongoing</p>
+                            <div class="text-center">
+                                <a href="https://maps.google.com/?q=Mowlem+Estate+Tononoka+Pheroz+Road+Kiambiu+Estate+Nairobi" target="_blank" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition inline-flex items-center">
+                                    <i class="fas fa-directions mr-2"></i>
+                                    Get Directions
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1420,6 +1426,21 @@
         
         function contactHR() {
             alert('HR Contact: Please call 0722225019 or visit our office for employment inquiries.');
+        }
+        
+        function downloadClassInfo(classType) {
+            const classData = {
+                preschool: { title: 'Pre-School (Play Group, PP1-PP2)' },
+                primary: { title: 'Primary School (Grade 1-6)' },
+                junior: { title: 'Junior School (Grade 7-9)' },
+                senior: { title: 'Senior School (Grade 10)' },
+                form: { title: 'Form 3 & Form 4' }
+            };
+            
+            const data = classData[classType];
+            if (data) {
+                alert(`Downloading ${data.title} information as PDF...`);
+            }
         }
         
         // Load news from backend
@@ -1616,10 +1637,17 @@
                             <div class="mt-6 p-4 bg-green-50 rounded-lg">
                                 <h4 class="font-bold text-green-800 mb-2">Additional Fees (All Students)</h4>
                                 <div class="text-sm space-y-1">
-                                    <p>• Interview: KSh 300</p>
+                                    <p>• Interview: KSh 500</p>
                                     <p>• Admission: KSh 1,000</p>
                                     <p>• Feeding Program: KSh 1,000/month</p>
                                 </div>
+                            </div>
+                            
+                            <div class="mt-6 text-center">
+                                <button onclick="downloadClassInfo('${classType}')" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition inline-flex items-center">
+                                    <i class="fas fa-download mr-2"></i>
+                                    Download PDF
+                                </button>
                             </div>
                         </div>
                     </div>

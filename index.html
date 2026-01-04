@@ -7,9 +7,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .gradient-bg { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        :root {
+            --primary: #059669;
+            --secondary: #10b981;
+            --accent: #34d399;
+            --dark-green: #047857;
+            --light-green: #d1fae5;
+        }
+        .gradient-bg { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .gradient-hero { background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #10b981 100%); }
+        .card-hover { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .card-hover:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 50px rgba(5, 150, 105, 0.3); }
+        .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .floating { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .pulse-green { animation: pulse-green 2s infinite; }
+        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } }
         
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
@@ -94,26 +107,35 @@
     </header>
 
     <!-- Hero Section -->
-    <section id="home" class="gradient-bg text-white py-12 md:py-20">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <h2 class="text-3xl md:text-5xl font-bold mb-4 md:mb-6">Welcome to Outering School</h2>
-            <p class="text-lg md:text-xl mb-6 md:mb-8 max-w-3xl mx-auto">Grade 10 Approved School & KCSE Centre - Day School for Both Boys and Girls</p>
-            <div class="hero-stats grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8 md:mt-12">
-                <div class="text-center">
-                    <div class="text-2xl md:text-3xl font-bold">800+</div>
-                    <div class="text-sm opacity-90">Students</div>
+    <section id="home" class="gradient-hero text-white py-16 md:py-24 relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="absolute top-10 left-10 w-32 h-32 bg-green-400/20 rounded-full blur-xl floating"></div>
+        <div class="absolute bottom-10 right-10 w-48 h-48 bg-emerald-400/20 rounded-full blur-xl floating" style="animation-delay: -3s;"></div>
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
+            <div class="glass-effect rounded-3xl p-8 md:p-12 mb-8">
+                <h2 class="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent">Welcome to Outering School</h2>
+                <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto text-green-100">Grade 10 Approved School & KCSE Centre - Day School for Both Boys and Girls</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="bg-green-500 hover:bg-green-400 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 pulse-green">Apply Now</button>
+                    <button class="glass-effect hover:bg-white/20 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300">Learn More</button>
                 </div>
-                <div class="text-center">
-                    <div class="text-2xl md:text-3xl font-bold">45+</div>
-                    <div class="text-sm opacity-90">Faculty</div>
+            </div>
+            <div class="hero-stats grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
+                <div class="glass-effect rounded-2xl p-6 text-center card-hover">
+                    <div class="text-3xl md:text-4xl font-bold text-green-300 mb-2">800+</div>
+                    <div class="text-sm text-green-100">Students</div>
                 </div>
-                <div class="text-center">
-                    <div class="text-2xl md:text-3xl font-bold">KCSE</div>
-                    <div class="text-sm opacity-90">Centre</div>
+                <div class="glass-effect rounded-2xl p-6 text-center card-hover">
+                    <div class="text-3xl md:text-4xl font-bold text-green-300 mb-2">45+</div>
+                    <div class="text-sm text-green-100">Faculty</div>
                 </div>
-                <div class="text-center">
-                    <div class="text-2xl md:text-3xl font-bold">2026</div>
-                    <div class="text-sm opacity-90">Interviews</div>
+                <div class="glass-effect rounded-2xl p-6 text-center card-hover">
+                    <div class="text-3xl md:text-4xl font-bold text-green-300 mb-2">KCSE</div>
+                    <div class="text-sm text-green-100">Centre</div>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 text-center card-hover">
+                    <div class="text-3xl md:text-4xl font-bold text-green-300 mb-2">2026</div>
+                    <div class="text-sm text-green-100">Interviews</div>
                 </div>
             </div>
         </div>
@@ -165,24 +187,24 @@
             </div>
             
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-blue-50 rounded-xl p-8 card-hover">
-                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div class="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-8 card-hover border border-green-200">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                         <i class="fas fa-chart-line text-white text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Significant Academic Progress</h3>
                     <p class="text-gray-600 text-center">We are committed to achieving significant academic progress by leveraging data-driven insights to progressively develop each learner's competencies incrementally to ensure that every learner achieves their full potential.</p>
                 </div>
                 
-                <div class="bg-green-50 rounded-xl p-8 card-hover">
-                    <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div class="bg-gradient-to-br from-emerald-50 to-green-100 rounded-2xl p-8 card-hover border border-emerald-200">
+                    <div class="w-16 h-16 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                         <i class="fas fa-heart text-white text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Pastoral Care</h3>
                     <p class="text-gray-600 text-center">We embrace our fundamental principles of putting learners' happiness first to create a genuinely happy learning environment, instil discipline, cultivate leadership qualities, and inculcate strong moral values grounded on Amani (Peace) Club principles.</p>
                 </div>
                 
-                <div class="bg-purple-50 rounded-xl p-8 card-hover">
-                    <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div class="bg-gradient-to-br from-green-50 to-teal-100 rounded-2xl p-8 card-hover border border-green-200">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                         <i class="fas fa-coins text-white text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Affordability</h3>
