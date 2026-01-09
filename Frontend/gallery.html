@@ -171,7 +171,11 @@
         // Render gallery
         function renderGallery() {
             const container = document.getElementById('galleryContainer');
-            const filteredItems = currentFilter === 'all' ? galleryItems : galleryItems.filter(item => item.type === currentFilter);
+            const filteredItems = currentFilter === 'all' ? galleryItems : galleryItems.filter(item => {
+                if (currentFilter === 'photos') return item.type === 'photo';
+                if (currentFilter === 'videos') return item.type === 'video';
+                return true;
+            });
             
             container.innerHTML = filteredItems.map(item => `
                 <div class="gallery-item bg-white rounded-xl shadow-lg overflow-hidden card-hover" onclick="openModal(${item.id})">
@@ -199,7 +203,7 @@
         function filterGallery(type) {
             currentFilter = type;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelector(`[onclick="filterGallery('${type}')"]`).classList.add('active');
             renderGallery();
         }
 
