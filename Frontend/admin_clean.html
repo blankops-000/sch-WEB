@@ -173,6 +173,7 @@
             
             const menuItems = [
                 { id: 'dashboard', label: 'Dashboard', icon: 'tachometer-alt' },
+                { id: 'gallery', label: 'Gallery', icon: 'images' },
                 { id: 'academics', label: 'Academics', icon: 'graduation-cap' },
                 { id: 'news', label: 'News', icon: 'newspaper' },
                 { id: 'calendar', label: 'Calendar', icon: 'calendar-alt' },
@@ -181,8 +182,273 @@
                 { id: 'contacts', label: 'Contacts', icon: 'envelope' }
             ];
             
+        const GalleryManager = () => {
+            const [galleryItems, setGalleryItems] = useState([]);
+            const [selectedItems, setSelectedItems] = useState([]);
+            const [showUpload, setShowUpload] = useState(false);
+            const [newItem, setNewItem] = useState({ title: '', description: '', type: 'photo' });
+            
+            useEffect(() => {
+                loadGalleryItems();
+            }, []);
+            
+            const loadGalleryItems = () => {
+                const saved = localStorage.getItem('gallery_items');
+                if (saved) {
+                    setGalleryItems(JSON.parse(saved));
+                } else {
+                    const defaultItems = [
+                        { id: 1, type: 'photo', title: 'School Assembly', description: 'Weekly school assembly', url: 'https://via.placeholder.com/300x200?text=Assembly', date: '2024-01-15', published: true },
+                        { id: 2, type: 'video', title: 'School Anthem', description: 'Students singing anthem', url: 'https://youtu.be/GqfbYaHTzoE', date: '2024-01-10', published: true },
+                        { id: 3, type: 'photo', title: 'Science Fair', description: 'Annual science fair', url: 'https://via.placeholder.com/300x200?text=Science+Fair', date: '2024-01-08', published: false }
+                    ];
+                    setGalleryItems(defaultItems);
+                    localStorage.setItem('gallery_items', JSON.stringify(defaultItems));
+                }
+            };
+            
+            const saveGalleryItems = (items) => {
+                localStorage.setItem('gallery_items', JSON.stringify(items));
+                setGalleryItems(items);
+            };
+            
+            const handleFileUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const newGalleryItem = {
+                            id: Date.now(),
+                            type: newItem.type,
+                            title: newItem.title,
+                            description: newItem.description,
+                            url: event.target.result,
+                            date: new Date().toISOString().split('T')[0],
+                            published: false
+                        };
+                        const updatedItems = [newGalleryItem, ...galleryItems];
+                        saveGalleryItems(updatedItems);
+                        setNewItem({ title: '', description: '', type: 'photo' });
+                        setShowUpload(false);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            const addVideoUrl = () => {
+                if (newItem.title && newItem.url) {
+                    const newGalleryItem = {
+                        id: Date.now(),
+                        type: 'video',
+                        title: newItem.title,
+                        description: newItem.description,
+                        url: newItem.url,
+                        date: new Date().toISOString().split('T')[0],
+                        published: false
+                    };
+                    const updatedItems = [newGalleryItem, ...galleryItems];
+                    saveGalleryItems(updatedItems);
+                    setNewItem({ title: '', description: '', type: 'photo', url: '' });
+                    setShowUpload(false);
+                }
+            };
+            
+            const togglePublish = (id) => {
+                const updatedItems = galleryItems.map(item => 
+                    item.id === id ? { ...item, published: !item.published } : item
+                );
+                saveGalleryItems(updatedItems);
+            };
+            
+            const deleteItem = (id) => {
+                if (confirm('Are you sure you want to delete this item?')) {
+                    const updatedItems = galleryItems.filter(item => item.id !== id);
+                    saveGalleryItems(updatedItems);
+                }
+            };
+            
+            const toggleSelect = (id) => {
+                setSelectedItems(prev => 
+                    prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+                );
+            };
+            
+            const publishSelected = () => {
+                const updatedItems = galleryItems.map(item => 
+                    selectedItems.includes(item.id) ? { ...item, published: true } : item
+                );
+                saveGalleryItems(updatedItems);
+                setSelectedItems([]);
+            };
+            
+            const unpublishSelected = () => {
+                const updatedItems = galleryItems.map(item => 
+                    selectedItems.includes(item.id) ? { ...item, published: false } : item
+                );
+                saveGalleryItems(updatedItems);
+                setSelectedItems([]);
+            };
+            
+            const deleteSelected = () => {
+                if (confirm(`Delete ${selectedItems.length} selected items?`)) {
+                    const updatedItems = galleryItems.filter(item => !selectedItems.includes(item.id));
+                    saveGalleryItems(updatedItems);
+                    setSelectedItems([]);
+                }
+            };
+            
+            return (
+                <div className="p-8 bg-white rounded-xl">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-3xl font-bold text-gray-900">Gallery Management</h2>
+                        <button 
+                            onClick={() => setShowUpload(!showUpload)}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                        >
+                            <i className="fas fa-plus mr-2"></i>Add Media
+                        </button>
+                    </div>
+                    
+                    {showUpload && (
+                        <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                            <h3 className="text-xl font-bold mb-4">Upload New Media</h3>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 className="font-semibold mb-3">Upload Photo</h4>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Photo title" 
+                                        value={newItem.type === 'photo' ? newItem.title : ''}
+                                        onChange={(e) => setNewItem({...newItem, title: e.target.value, type: 'photo'})}
+                                        className="w-full p-3 border rounded-lg mb-3"
+                                    />
+                                    <textarea 
+                                        placeholder="Description" 
+                                        value={newItem.type === 'photo' ? newItem.description : ''}
+                                        onChange={(e) => setNewItem({...newItem, description: e.target.value})}
+                                        className="w-full p-3 border rounded-lg mb-3 h-20"
+                                    />
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        onChange={handleFileUpload}
+                                        className="w-full p-2 border rounded-lg"
+                                    />
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold mb-3">Add Video URL</h4>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Video title" 
+                                        value={newItem.type === 'video' ? newItem.title : ''}
+                                        onChange={(e) => setNewItem({...newItem, title: e.target.value, type: 'video'})}
+                                        className="w-full p-3 border rounded-lg mb-3"
+                                    />
+                                    <textarea 
+                                        placeholder="Description" 
+                                        value={newItem.type === 'video' ? newItem.description : ''}
+                                        onChange={(e) => setNewItem({...newItem, description: e.target.value})}
+                                        className="w-full p-3 border rounded-lg mb-3 h-20"
+                                    />
+                                    <input 
+                                        type="url" 
+                                        placeholder="YouTube URL" 
+                                        value={newItem.url || ''}
+                                        onChange={(e) => setNewItem({...newItem, url: e.target.value})}
+                                        className="w-full p-3 border rounded-lg mb-3"
+                                    />
+                                    <button 
+                                        onClick={addVideoUrl}
+                                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                                    >
+                                        Add Video
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {selectedItems.length > 0 && (
+                        <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                            <div className="flex items-center justify-between">
+                                <span className="font-semibold">{selectedItems.length} items selected</span>
+                                <div className="space-x-2">
+                                    <button onClick={publishSelected} className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                        Publish
+                                    </button>
+                                    <button onClick={unpublishSelected} className="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700">
+                                        Unpublish
+                                    </button>
+                                    <button onClick={deleteSelected} className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {galleryItems.map(item => (
+                            <div key={item.id} className="bg-white border rounded-lg overflow-hidden shadow-sm">
+                                <div className="relative">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={selectedItems.includes(item.id)}
+                                        onChange={() => toggleSelect(item.id)}
+                                        className="absolute top-2 left-2 z-10"
+                                    />
+                                    {item.type === 'photo' ? (
+                                        <img src={item.url} alt={item.title} className="w-full h-32 object-cover" />
+                                    ) : (
+                                        <div className="w-full h-32 bg-gray-200 flex items-center justify-center">
+                                            <i className="fas fa-play-circle text-4xl text-red-600"></i>
+                                        </div>
+                                    )}
+                                    <div className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-semibold ${
+                                        item.published ? 'bg-green-600 text-white' : 'bg-gray-600 text-white'
+                                    }`}>
+                                        {item.published ? 'Published' : 'Draft'}
+                                    </div>
+                                </div>
+                                <div className="p-4">
+                                    <h4 className="font-semibold text-gray-900 mb-1">{item.title}</h4>
+                                    <p className="text-gray-600 text-sm mb-3">{item.description}</p>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs text-gray-500">{item.date}</span>
+                                        <div className="space-x-1">
+                                            <button 
+                                                onClick={() => togglePublish(item.id)}
+                                                className={`px-2 py-1 rounded text-xs ${
+                                                    item.published ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700'
+                                                } text-white`}
+                                            >
+                                                {item.published ? 'Unpublish' : 'Publish'}
+                                            </button>
+                                            <button 
+                                                onClick={() => deleteItem(item.id)}
+                                                className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {galleryItems.length === 0 && (
+                        <div className="text-center py-12">
+                            <i className="fas fa-images text-6xl text-gray-300 mb-4"></i>
+                            <p className="text-gray-500">No media items yet. Click "Add Media" to get started.</p>
+                        </div>
+                    )}
+                </div>
+            );
             const renderContent = () => {
                 switch(activeSection) {
+                    case 'gallery':
+                        return <GalleryManager />;
                     case 'academics':
                         return <div className="p-8 bg-white rounded-xl"><h2 className="text-2xl font-bold">Academics Management</h2><p>Manage academic content here.</p></div>;
                     case 'news':

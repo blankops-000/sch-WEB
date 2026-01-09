@@ -100,6 +100,7 @@
                     <a href="#news" class="hover:text-yellow-300 transition">News</a>
                     <a href="#calendar" class="hover:text-yellow-300 transition">Calendar</a>
                     <a href="#fees" class="hover:text-yellow-300 transition">Fees</a>
+                    <a href="gallery.html" class="hover:text-yellow-300 transition">Gallery</a>
                     <a href="#application" class="hover:text-yellow-300 transition">Apply Now</a>
                     <a href="#careers" class="hover:text-yellow-300 transition">Careers</a>
                     <a href="#staff" class="hover:text-yellow-300 transition">Staff</a>
@@ -122,6 +123,7 @@
                     <a href="#news" class="mobile-nav-item hover:text-yellow-300 transition">News</a>
                     <a href="#calendar" class="mobile-nav-item hover:text-yellow-300 transition">Calendar</a>
                     <a href="#fees" class="mobile-nav-item hover:text-yellow-300 transition">Fees</a>
+                    <a href="gallery.html" class="mobile-nav-item hover:text-yellow-300 transition">Gallery</a>
                     <a href="#application" class="mobile-nav-item hover:text-yellow-300 transition">Apply Now</a>
                     <a href="#careers" class="mobile-nav-item hover:text-yellow-300 transition">Careers</a>
                     <a href="#staff" class="mobile-nav-item hover:text-yellow-300 transition">Staff</a>
@@ -137,7 +139,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section id="home" class="text-white py-8 md:py-20 hero-bg" style="background: linear-gradient(rgba(5, 150, 105, 0.4), rgba(4, 120, 87, 0.4)), url('w3.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
+    <section id="home" class="text-white py-8 md:py-20 hero-bg" style="background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('w3.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
         <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
             <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 md:mb-6">Welcome to Outering Schools</h2>
             <p class="text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-3xl mx-auto px-2">Grade 10 Approved School & KCSE Centre - Day School for Both Boys and Girls</p>
@@ -145,15 +147,17 @@
             <!-- Campus Information -->
             <div class="mb-6 md:mb-12">
                 <div class="campus-grid grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 max-w-4xl mx-auto">
-                    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 md:p-4">
-                        <h3 class="font-bold text-yellow-300 mb-2 text-sm md:text-base">📍 Campus 1: Mowlem</h3>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 md:p-4 cursor-pointer hover:bg-white/20 transition" onclick="openCampusMap('mowlem')">
+                        <h3 class="font-bold text-green-300 mb-2 text-sm md:text-base">📍 Campus 1: Mowlem</h3>
                         <p class="text-xs md:text-sm">Mowlem Estate, Tononoka</p>
                         <p class="text-xs md:text-sm">Pheroz Road off Kangundo Road</p>
+                        <p class="text-xs text-green-200 mt-1">Click to view on map</p>
                     </div>
-                    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 md:p-4">
-                        <h3 class="font-bold text-yellow-300 mb-2 text-sm md:text-base">📍 Campus 2: Kiambiu</h3>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 md:p-4 cursor-pointer hover:bg-white/20 transition" onclick="openCampusMap('kiambiu')">
+                        <h3 class="font-bold text-green-300 mb-2 text-sm md:text-base">📍 Campus 2: Kiambiu</h3>
                         <p class="text-xs md:text-sm">Kiambiu Mabatini</p>
                         <p class="text-xs md:text-sm">Behind Buru Buru 1 / Kwa Chief City Carton</p>
+                        <p class="text-xs text-green-200 mt-1">Click to view on map</p>
                     </div>
                 </div>
             </div>
@@ -1382,6 +1386,23 @@
     </footer>
 
     <script>
+        // Open campus location on Google Maps
+        function openCampusMap(campus) {
+            let mapUrl;
+            
+            if (campus === 'mowlem') {
+                // Mowlem Estate, Tononoka, Pheroz Road off Kangundo Road
+                mapUrl = 'https://www.google.com/maps/search/Mowlem+Estate+Tononoka+Pheroz+Road+Kangundo+Road+Nairobi';
+            } else if (campus === 'kiambiu') {
+                // Kiambiu Mabatini, Behind Buru Buru 1
+                mapUrl = 'https://www.google.com/maps/search/Kiambiu+Mabatini+Buru+Buru+1+Nairobi';
+            }
+            
+            if (mapUrl) {
+                window.open(mapUrl, '_blank');
+            }
+        }
+        
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobileMenu');
             mobileMenu.classList.toggle('hidden');
