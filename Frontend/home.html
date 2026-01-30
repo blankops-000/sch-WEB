@@ -1427,7 +1427,7 @@
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
             modal.innerHTML = `
-                <div class="bg-white rounded-xl p-6 md:p-8 max-w-md w-full mx-4">
+                <div class="bg-white rounded-xl p-6 md:p-8 max-w-md md:max-w-2xl lg:max-w-4xl w-full mx-4">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-900">Join Our Alumni Network</h2>
                         <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
@@ -1440,61 +1440,63 @@
                             <p class="text-gray-600">Follow Outering School on social media and stay connected with our alumni community</p>
                         </div>
                         
-                        <a href="https://www.instagram.com/outer_ringschools?igsh=NnpzdGtnZXZwNWk3" target="_blank" class="flex items-center p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition">
-                            <i class="fab fa-instagram text-pink-500 text-2xl mr-4"></i>
-                            <div>
-                                <h3 class="font-bold text-gray-900">Instagram</h3>
-                                <p class="text-sm text-gray-600">@outer_ringschools</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <a href="https://www.instagram.com/outer_ringschools?igsh=NnpzdGtnZXZwNWk3" target="_blank" class="flex items-center p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition">
+                                <i class="fab fa-instagram text-pink-500 text-2xl mr-4"></i>
+                                <div>
+                                    <h3 class="font-bold text-gray-900">Instagram</h3>
+                                    <p class="text-sm text-gray-600">@outer_ringschools</p>
+                                </div>
+                            </a>
+                            
+                            <a href="https://www.linkedin.com/in/outering-schools-31474221a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                                <i class="fab fa-linkedin-in text-blue-500 text-2xl mr-4"></i>
+                                <div>
+                                    <h3 class="font-bold text-gray-900">LinkedIn</h3>
+                                    <p class="text-sm text-gray-600">Outering Schools</p>
+                                </div>
+                            </a>
+                            
+                            <a href="https://x.com/outeringschools" target="_blank" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                                <i class="fab fa-twitter text-blue-500 text-2xl mr-4"></i>
+                                <div>
+                                    <h3 class="font-bold text-gray-900">Twitter/X</h3>
+                                    <p class="text-sm text-gray-600">@outeringschools</p>
+                                </div>
+                            </a>
+                            
+                            <a href="https://www.youtube.com/@outeringschools4319" target="_blank" class="flex items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition">
+                                <i class="fab fa-youtube text-red-500 text-2xl mr-4"></i>
+                                <div>
+                                    <h3 class="font-bold text-gray-900">YouTube</h3>
+                                    <p class="text-sm text-gray-600">@outeringschools4319</p>
+                                </div>
+                            </a>
+                            
+                            <div class="flex items-center p-4 bg-green-50 rounded-lg">
+                                <i class="fab fa-whatsapp text-green-500 text-2xl mr-4"></i>
+                                <div>
+                                    <h3 class="font-bold text-gray-900">WhatsApp</h3>
+                                    <p class="text-sm text-gray-600">+254 722 225 019</p>
+                                </div>
                             </div>
-                        </a>
-                        
-                        <a href="https://www.linkedin.com/in/outering-schools-31474221a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
-                            <i class="fab fa-linkedin-in text-blue-500 text-2xl mr-4"></i>
-                            <div>
-                                <h3 class="font-bold text-gray-900">LinkedIn</h3>
-                                <p class="text-sm text-gray-600">Outering Schools</p>
-                            </div>
-                        </a>
-                        
-                        <a href="https://x.com/outeringschools" target="_blank" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
-                            <i class="fab fa-twitter text-blue-500 text-2xl mr-4"></i>
-                            <div>
-                                <h3 class="font-bold text-gray-900">Twitter/X</h3>
-                                <p class="text-sm text-gray-600">@outeringschools</p>
-                            </div>
-                        </a>
-                        
-                        <a href="https://www.youtube.com/@outeringschools4319" target="_blank" class="flex items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition">
-                            <i class="fab fa-youtube text-red-500 text-2xl mr-4"></i>
-                            <div>
-                                <h3 class="font-bold text-gray-900">YouTube</h3>
-                                <p class="text-sm text-gray-600">@outeringschools4319</p>
-                            </div>
-                        </a>
-                        
-                        <div class="flex items-center p-4 bg-green-50 rounded-lg">
-                            <i class="fab fa-whatsapp text-green-500 text-2xl mr-4"></i>
-                            <div>
-                                <h3 class="font-bold text-gray-900">WhatsApp</h3>
-                                <p class="text-sm text-gray-600">+254 722 225 019</p>
-                            </div>
+                            
+                            <a href="mailto:outeringschools001@gmail.com" class="flex items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition">
+                                <i class="fas fa-envelope text-red-500 text-2xl mr-4"></i>
+                                <div>
+                                    <h3 class="font-bold text-gray-900">Official Email</h3>
+                                    <p class="text-sm text-gray-600">outeringschools001@gmail.com</p>
+                                </div>
+                            </a>
+                            
+                            <a href="mailto:info@outeringschools.ac.ke" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                                <i class="fas fa-info-circle text-blue-500 text-2xl mr-4"></i>
+                                <div>
+                                    <h3 class="font-bold text-gray-900">Info Email</h3>
+                                    <p class="text-sm text-gray-600">info@outeringschools.ac.ke</p>
+                                </div>
+                            </a>
                         </div>
-                        
-                        <a href="mailto:outeringschools001@gmail.com" class="flex items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition">
-                            <i class="fas fa-envelope text-red-500 text-2xl mr-4"></i>
-                            <div>
-                                <h3 class="font-bold text-gray-900">Official Email</h3>
-                                <p class="text-sm text-gray-600">outeringschools001@gmail.com</p>
-                            </div>
-                        </a>
-                        
-                        <a href="mailto:info@outeringschools.ac.ke" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
-                            <i class="fas fa-info-circle text-blue-500 text-2xl mr-4"></i>
-                            <div>
-                                <h3 class="font-bold text-gray-900">Info Email</h3>
-                                <p class="text-sm text-gray-600">info@outeringschools.ac.ke</p>
-                            </div>
-                        </a>
                     </div>
                     
                     <div class="mt-6">
@@ -1504,6 +1506,24 @@
                     </div>
                 </div>
             `;
+            
+            // Add escape key functionality
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    modal.remove();
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+            
+            // Close on backdrop click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            });
+            
             document.body.appendChild(modal);
         }
         
